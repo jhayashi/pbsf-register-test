@@ -1,0 +1,1976 @@
+<!DOCTYPE html>
+<!-- APP_VERSION 1.00 -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PBSF Spring 2027 Registration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{--cobalt:#2C2C74;--cobalt-d:#1e1e52;--ink:#1a2230;--muted:#5b6472;--line:#e4e8ef;
+        --bg:#eef1f6;--ok:#0a7d38;--warn:#b23b0e;--chip:#eef3ff;--stripe:#635bff;}
+  *{box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0;background:var(--bg);color:var(--ink)}
+  header{background:#fff;padding:16px 18px 0}
+  .brand{max-width:960px;margin:0 auto;display:flex;align-items:center;gap:14px}
+  .brand img{width:78px;height:auto;flex:0 0 auto}
+  .brand .bt{font-family:'Poppins',system-ui,-apple-system,sans-serif;font-weight:600;
+    color:var(--cobalt);letter-spacing:.01em;line-height:1.15;font-size:1.18rem;
+    text-transform:uppercase}
+  .brand .bs{color:var(--muted);font-size:.74rem;margin-top:3px;text-transform:none;
+    font-family:system-ui,-apple-system,sans-serif;font-weight:400}
+  .rule{max-width:960px;margin:14px auto 0;border:0;border-top:2px solid var(--cobalt);opacity:.85}
+  @media(max-width:420px){ .brand .bt{font-size:.9rem} .brand img{width:52px} }
+  .proto{background:#fff8e6;border-bottom:1px solid #f0e2b8;color:#6b5410;font-size:.72rem;padding:7px 14px;text-align:center}
+  .steps{display:flex;gap:4px;padding:12px 16px 0;max-width:960px;margin:0 auto}
+  .dot{flex:1;height:5px;border-radius:3px;background:#d5dbe6}
+  .dot.on{background:var(--cobalt)} .dot.done{background:var(--ok)}
+  .wrap{max-width:960px;margin:0 auto;padding:14px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 1px 3px rgba(20,30,50,.05)}
+  h2{margin:0 0 4px;font-size:1.05rem} .sub{color:var(--muted);font-size:.8rem;margin:0 0 14px}
+  .q{margin-bottom:14px} label.qt{display:flex;gap:8px;align-items:center;font-weight:600;font-size:.88rem;margin-bottom:6px}
+  .req{color:var(--warn)} .help{font-size:.74rem;color:var(--muted);margin:-2px 0 6px}
+  /* :not([type=checkbox]) is load-bearing. The blanket rule gave the processing-support
+     checkbox width:100%, 10px padding and a border, so inside its flex label it became a
+     full-width bordered box with the tick stranded in the middle of it and the text shoved
+     to the far right. A checkbox is not a text field and must not inherit text-field sizing. */
+  input:not([type=checkbox]),select{width:100%;padding:10px;border:1.5px solid var(--line);border-radius:10px;font-size:.92rem;background:#fff}
+  input[type=checkbox]{width:18px;height:18px;flex:0 0 auto;margin:0;accent-color:var(--cobalt);cursor:pointer}
+  /* An opt-in, so it reads as a bounded choice rather than stray text between the
+     step's sub-line and the total. align-items:flex-start keeps the box on the first
+     line when the note wraps. */
+  .supportbox{display:flex;gap:10px;align-items:flex-start;cursor:pointer;text-align:left;
+    border:1.5px solid var(--line);border-radius:10px;padding:12px;margin-bottom:14px;
+    background:#fbfcfe}
+  .supportbox:hover{border-color:var(--cobalt)}
+  .supportbox:focus-within{border-color:var(--cobalt);box-shadow:0 0 0 3px rgba(40,50,140,.10)}
+  .supportbox input[type=checkbox]{margin-top:2px}
+  .sbtext{font-size:.88rem;line-height:1.35}
+  .sbnote{display:inline-block;margin-top:3px;font-size:.74rem;color:var(--muted);line-height:1.35}
+  input:focus,select:focus{outline:none;border-color:var(--cobalt)}
+  .row{display:flex;gap:10px} .row>*{flex:1}
+  .opts{display:flex;gap:8px;flex-wrap:wrap}
+  .opt{flex:1;min-width:120px;border:1.5px solid var(--line);border-radius:10px;padding:11px;text-align:center;cursor:pointer;font-size:.9rem;user-select:none}
+  .opt:focus{outline:2px solid var(--cobalt);outline-offset:2px}
+  .opt.sel{border-color:var(--cobalt);background:var(--chip);color:var(--cobalt-d);font-weight:600}
+  .chip{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:2px 7px;border-radius:20px;background:#eaf1ff;color:var(--cobalt-d)}
+  .chip.calc{background:#e7f7ec;color:var(--ok)}
+  .lockmsg{font-size:.76rem;color:var(--cobalt-d);background:var(--chip);border-radius:8px;padding:8px 10px;margin-top:6px}
+  .hidden{display:none}
+  .feebox{border:1.5px dashed var(--cobalt);background:linear-gradient(135deg,#f5f8ff,#eef3ff);border-radius:12px;padding:14px;margin-top:6px}
+  .frow{display:flex;justify-content:space-between;margin:4px 0;font-size:.9rem} .frow .rl{color:var(--muted)}
+  .fee{font-size:1.7rem;font-weight:800;color:var(--cobalt-d)}
+  .ferr{color:var(--warn);font-size:.72rem;margin-top:4px}
+  .esugg{font-size:.8rem;margin-top:6px;color:#6b5410;background:#fff8e6;border:1px solid #f0e2b8;
+    border-radius:8px;padding:7px 9px;line-height:1.5;overflow-wrap:anywhere}
+  .esugg button{margin:2px 0 0 6px;font-size:.76rem;padding:3px 9px;border-radius:6px;cursor:pointer;
+    border:1px solid var(--cobalt);background:#fff;color:var(--cobalt);font-weight:600}
+  .esugg button.keep{border-color:#d9c88f;color:#6b5410;font-weight:500}
+  .revmail{margin-top:8px;padding:9px 11px;border-radius:10px;background:#f5f8ff;border:1px solid #dfe6f5;
+    font-size:.88rem;line-height:1.5}
+  .badfield{border-color:var(--warn)!important}
+  .valerr{background:#fdece4;border:1px solid #f3c4ad;color:var(--warn);border-radius:10px;padding:10px;font-size:.82rem;margin-top:6px}
+  .nav{display:flex;gap:10px;margin-top:16px}
+  button{padding:12px;border:0;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer}
+  .primary{background:var(--cobalt);color:#fff;flex:2} .primary:disabled{background:#c1c8d6;cursor:not-allowed}
+  a.btnlink{display:block;padding:12px;border-radius:10px;font-size:.95rem;font-weight:700;text-align:center;text-decoration:none}
+  .ghost{background:#eef1f6;color:var(--ink);flex:1}
+  .chk{display:flex;gap:9px;align-items:flex-start;font-size:.85rem}
+  .chk input{width:auto;margin-top:2px}
+  .rev{font-size:.86rem;line-height:1.7} .rev b{color:var(--muted);font-weight:600}
+  /* The donation is its own section, set apart above and below, so it never reads as part of
+     the address or of the fee box -- and is unmistakably optional. */
+  .donbox{margin:24px 0;padding:16px 16px 4px;border:1px solid var(--line);border-radius:12px;background:#fbfcfe}
+  .donhead{display:flex;gap:8px;align-items:center;font-weight:700;font-size:.95rem;margin-bottom:6px}
+  .dontext{font-size:.82rem;color:var(--muted);line-height:1.45;margin:0 0 12px}
+  .donpicks{margin-bottom:14px} .donpicks .opt{min-width:64px;padding:10px 6px;font-weight:600}
+  /* stripe */
+  .stripe-head{display:flex;align-items:center;gap:8px;color:var(--stripe);font-weight:800;font-size:.9rem;margin-bottom:2px}
+  .test-badge{background:#ffe9b3;color:#7a5a00;font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:5px;letter-spacing:.02em}
+  .amt{font-size:2rem;font-weight:800;margin:6px 0 12px}
+  .stripe-pay{background:var(--stripe);color:#fff;width:100%} .stripe-pay:disabled{opacity:.6}
+  .succ{text-align:center;padding:8px}
+  .succ .big{font-size:2.6rem} .badge-paid{display:inline-block;background:#e7f7ec;color:var(--ok);border:1px solid #b7e6c6;font-weight:800;padding:6px 14px;border-radius:20px;margin:8px 0}
+  .cover{font-size:.9rem;line-height:1.65;color:#2c3542;max-width:82ch;margin:0 auto}
+  .cover p{margin:0 0 11px} .cover ul{margin:0 0 11px 18px;padding:0}
+  .divs{display:flex;gap:28px;flex-wrap:wrap}
+  .divs>div{flex:1 1 300px;min-width:0}
+  @media(max-width:560px){ .divs{gap:0} }
+  .ptab{width:100%;border-collapse:collapse;font-size:.82rem;margin:0 0 8px}
+  .ptab th,.ptab td{text-align:left;padding:5px 7px;border-bottom:1px solid #e6ebf1}
+  .ptab th{font-weight:600;color:#4a5563;font-size:.7rem;text-transform:uppercase;
+    letter-spacing:.03em;border-bottom-width:2px}
+  .ptab th.p,.ptab td.p{text-align:right;white-space:nowrap;
+    font-variant-numeric:tabular-nums}
+  .ptab .now{background:#eef8f0}
+  .ptab td.past,.ptab th.past{color:var(--muted);text-decoration:line-through}
+  .tnote{font-size:.74rem;color:var(--muted);margin:0 0 11px}
+  .ferr:empty{display:none}
+  .cover li{margin:2px 0}
+  .wbody{max-height:170px;overflow-y:auto;background:#fafbfd;border:1px solid var(--line);border-radius:8px;padding:10px;font-size:.78rem;line-height:1.5;color:#38414f;margin-bottom:10px}
+  .pcard{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+  .phead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  button:focus-visible,a:focus-visible{outline:2px solid var(--cobalt);outline-offset:2px}
+  .rmbtn{flex:0;padding:6px 10px;font-size:.78rem}
+  .foot{font-size:.7rem;color:var(--muted);text-align:center;padding:12px 0 20px}
+  .enf{background:#eef8f0;border:1px solid #cfe9d6;border-radius:10px;padding:10px;font-size:.78rem;color:#12622f;margin-top:10px;text-align:left}
+  .rrow{display:flex;justify-content:space-between;gap:12px;padding:3px 0}
+  .rrow span:last-child{white-space:nowrap}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <img src="https://static.wixstatic.com/media/25ff84_e3a5f88358f2474ba33de547f0bca0e1~mv2.png/v1/fill/w_220,h_172,al_c,q_85,enc_auto/PBSF-Logo-2020-clear_edited.png"
+         alt="Piedmont Baseball Softball Foundation">
+    <div><div class="bt">Piedmont Baseball Softball Foundation</div>
+         <div class="bs">Spring 2027 &middot; Player Registration</div></div>
+  </div>
+  <hr class="rule">
+</header>
+<div class="proto">🧪 TEST MODE — payments here use Stripe's sandbox and take no real money. Registrations do not count.</div>
+<div class="steps" id="steps"></div>
+<div class="wrap"><div class="card" id="stage"></div>
+<div class="foot">Piedmont Baseball Softball Foundation · Spring 2027 · fees are set by the league and calculated at checkout.</div></div>
+
+<script>
+var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbzgWN-nkhr1oa6xrSvMMsQOkBJSKciv4fHzPKctx7ccKO8TP_lmJSbryeI7aPODp4o37A/exec'; // <-- paste the Apps Script /exec URL
+/* No Content-Type header => the browser sends text/plain => no CORS preflight, which
+   Apps Script cannot answer. Apps Script reads the raw e.postData.contents.
+   The response IS readable: /exec returns access-control-allow-origin:* on both the
+   302 and the final googleusercontent response (measured 2026-07-28), so unlike the
+   original prototype we no longer discard it -- the server's refusals are the only
+   way the user learns why a submission failed.
+   Division, fee and total are deliberately NOT sent. The server derives them. */
+/* One id per submission ATTEMPT, not per request. Kept on the state object so a
+   re-render cannot mint a new one -- render() rebuilds everything else on every state
+   change, which is exactly how a per-request id would have crept in. */
+function submissionId(){
+  if(!s._submissionId) s._submissionId=uuid4();
+  return s._submissionId;
+}
+function uuid4(){
+  if(window.crypto&&crypto.randomUUID) return crypto.randomUUID();
+  // randomUUID needs a secure context. https everywhere in practice, but a fallback
+  // costs one line and the server validates the shape either way.
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){
+    var r=Math.random()*16|0; return (c==='x'?r:(r&0x3|0x8)).toString(16);
+  });
+}
+
+/* Stripe Checkout REFUSES to be framed -- it fails to a blank box with no error -- and
+   this form is pasted into a Wix Embed HTML element, so it is usually inside an iframe.
+   Navigate the TOP window where the browser permits it, and degrade rather than trap a
+   family who has a registration saved and no way to pay for it. */
+/* A refused top-level navigation NEITHER throws NOR returns a value -- Chrome logs a
+   violation and does nothing -- so failure here is undetectable by construction. The
+   previous version caught nothing, returned true regardless, and the caller read that
+   as success: the family sat on a disabled button reading "Taking you to payment…"
+   with no link, no error and an empty console, registration saved PENDING and no way
+   to pay it. That is the state the function exists to prevent.
+
+   And it is the EXPECTED path, not an edge case. A cross-origin child may navigate the
+   top frame only with TRANSIENT user activation, which Chrome expires after ~5s, and
+   the click that starts this spends that budget waiting on a POST that writes N sheet
+   rows, takes a script lock, and creates a Stripe Checkout Session. Apps Script
+   round trips of 5-10s are ordinary. window.open needs the same activation, so the
+   fallback expires with it.
+
+   Hence: no return value. Callers paint the manual link BEFORE calling, and a
+   navigation that works means nobody ever reads it. */
+function goToCheckout(url){
+  // Server-controlled today; a scheme check is free and stops a javascript: URL ever
+  // reaching location.href if that ever stops being true.
+  if(!/^https:\/\/[a-z0-9.-]+\.stripe\.com\//.test(url)) return;
+  try{
+    if(window.top&&window.top!==window.self){ window.top.location.href=url; return; }
+  }catch(e){ /* cross-origin: top is not ours to navigate */ }
+  /* ONLY when we are not framed. Navigating the frame itself loads Checkout inside the
+     Wix embed, which Stripe refuses to be framed in -- a blank box with no error, which
+     is strictly worse than doing nothing and leaving the family the link. */
+  if(window.top===window.self){ try{ window.location.href=url; return; }catch(e2){} }
+  window.open(url,'_blank','noopener');
+}
+
+function submitToBackend(){
+  var payload={
+    env:ENV, formVersion:FORM_VERSION, donation:donationNum(),
+    /* Generated ONCE, when the family first reaches submit, and reused on every retry.
+       A double-click or a retry-after-timeout then dedupes to one registration instead
+       of two -- and the server refuses anything that is not a v4 UUID, so nobody can
+       later derive it from an email and make it guessable. */
+    submissionId:submissionId(),
+    /* Our own URL, so the server can build success_url from it. It validates against an
+       allowlist and falls back on rejection -- the client does not get to choose where
+       a paying family lands. */
+    returnUrl:location.href,
+    support:s.support?1:0,
+    shared:withNormalZip(s.shared),
+    players:s.players.map(function(p){
+      /* sport is sent as chosen; the server re-derives it (boys are baseball only)
+         and re-derives the division from sport+grade. Division, fee and total are
+         deliberately absent -- sending them would invite trusting them. */
+      return { first:p.first, last:p.last, dob:normalizeDob(p.dob)||p.dob, gender:p.gender, sport:p.sport,
+               /* Names only -- a request the server checks against eligibility. */
+               programs:pPrograms(p).map(function(x){ return x.division; }),
+               grade:p.grade, school:p.school, shirt:p.shirt,
+               considerCoaching:p.considerCoaching, friendRequest:p.friendRequest,
+               notes:p.notes };
+    }),
+    waivers:s.waivers
+  };
+  if(NOW_OVERRIDE) payload.now=NOW_OVERRIDE;
+  return fetch(BACKEND_URL,{method:'POST',body:JSON.stringify(payload)})
+    .then(function(r){ return r.json(); })
+    .catch(function(){ return {ok:false,error:'Could not reach the registration server.'}; });
+}
+
+/* Fail closed. A stale price shown during an outage is worse than no form at all,
+   and falling back to a built-in table would reintroduce the duplication that having
+   one server-side fee table exists to remove. */
+/* The three ways a family arrives back from Stripe. Handled BEFORE the version gate
+   below, and that ordering is the whole point: registration.html is served from a
+   content-addressed URL that never changes, so after any FORM_VERSION bump an
+   in-flight payment returns to a page that would otherwise refuse to render -- telling
+   someone who has just been charged to start again. A page that only DISPLAYS a result
+   runs no pricing logic and needs no version guard. */
+function returnParams(){
+  return { sessionId: QS.get('session_id'),
+           groupId: QS.get('groupId'),
+           cancelled: QS.get('payment')==='cancelled' };
+}
+
+function showReceipt(stage, data){
+  /* Rendered ONLY from the server's response. Wizard state does not survive the
+     redirect -- this is a fresh top-level page load, so s.players and total() are
+     empty -- and building the receipt from them is the exact shape CLAUDE.md records
+     from Task 5: a path nothing exercises, built from fields that are no longer there. */
+  var lines=(data.players||[]).map(function(p){
+    return '<div class="rrow"><span>'+esc(p.name)+' &middot; '+esc(divLabel(p.division))+
+           (p.comboDiscount>0?' (2nd program)':'')+'</span>'+
+           '<span>'+money(p.listFee)+'</span></div>';
+  }).join('');
+  var a=data.amounts||{};
+  function row(label,cents){ return cents>0
+    ? '<div class="rrow"><span>'+label+'</span><span>'+money(cents)+'</span></div>' : ''; }
+  stage.innerHTML='<div class="succ"><div class="big">🎉</div>'+
+    '<h2>Payment received</h2>'+
+    '<div class="badge-paid">'+money(a.total)+' paid</div>'+
+    '<div class="enf" style="text-align:left">'+lines+
+      row('Donation to PBSF',a.donation)+
+      row(data.processingMandatory?'Processing fee':'Processing support',a.processingSupport)+
+      (a.discount>0?'<div class="rrow"><span>Financial aid'+
+        (data.couponCode?' ('+esc(data.couponCode)+')':'')+'</span><span>&minus;'+
+        money(a.discount)+'</span></div>':'')+
+      '<div class="rrow" style="font-weight:700;border-top:1px solid #ccc;margin-top:6px;'+
+      'padding-top:6px"><span>Total paid</span><span>'+money(a.total)+'</span></div>'+
+    '</div>'+
+    (data.receiptTaxNote?'<p class="sub">'+esc(data.receiptTaxNote)+'</p>':'')+
+    '<p class="sub">A confirmation email is on its way. Questions: <a href="mailto:'+
+    esc(data.registrarEmail)+'">'+esc(data.registrarEmail)+'</a></p>'+
+    '<p class="sub" style="font-size:12px">Reference: '+esc(data.groupId)+'</p></div>';
+}
+
+function money(cents){
+  var n=Math.round(Number(cents)||0);
+  return '$'+(n/100).toFixed(2).replace(/\.00$/,'');
+}
+
+function handleReturn(stage){
+  var rp=returnParams();
+  if(rp.sessionId){
+    stage.innerHTML='<h2>Confirming your payment…</h2>'+
+      '<p class="sub">One moment. Do not close this page.</p>';
+    fetch(BACKEND_URL,{method:'POST',body:JSON.stringify(
+      {env:ENV,action:'confirm',sessionId:rp.sessionId})})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(d&&d.ok){ showReceipt(stage,d); return; }
+        /* THE SERVER KNOWS WHETHER MONEY ARRIVED, so ask it rather than assuming.
+           pending:true means Stripe says the session is not complete -- the family did
+           NOT pay, and telling them "payment received" would be a lie they act on. An
+           earlier version showed the reassuring message for every non-ok response and
+           did exactly that for an abandoned checkout. */
+        if(d&&d.pending){
+          stage.innerHTML='<h2>Your registration is saved</h2>'+
+            '<p class="sub">We have not received a payment for it yet, and you have not '+
+            'been charged.</p>'+
+            '<button class="primary" id="resumeBtn" style="width:100%">Continue to '+
+            'payment</button><div id="resumeErr"></div>';
+          if(rp.groupId) wireResume(rp.groupId);
+          return;
+        }
+        /* Anything else: confirmation failed but the money MAY have moved -- a network
+           error, a lock timeout, a wrong-mode key. Never show a failure that implies
+           they were not charged; the reconciler catches it within 30 minutes. */
+        stage.innerHTML='<h2>Payment received</h2><p class="sub">We are still confirming '+
+          'it with our records. Your confirmation email will arrive shortly &mdash; there '+
+          'is nothing more for you to do. If it has not arrived within an hour, contact '+
+          '<a href="mailto:info@piedmontbaseball.org">info@piedmontbaseball.org</a> '+
+          'quoting '+esc(rp.groupId||rp.sessionId)+'.</p>';
+      })
+      .catch(function(){
+        /* Fires on any fetch rejection AND on any non-JSON body -- so a stale Apps
+           Script deployment serving an HTML error page sends EVERY returning family
+           here. It must not assert a fact it cannot establish ("your payment went
+           through"), and unlike the branch above it used to hand them no reference at
+           all, leaving nothing to quote to support. Keep the reassurance -- never imply
+           they were not charged -- drop the claim, carry the reference. */
+        stage.innerHTML='<h2>Payment received</h2><p class="sub">We could not reach our '+
+          'server to confirm it just now. Your confirmation email will follow &mdash; '+
+          'there is nothing more for you to do. If it has not arrived within an hour, '+
+          'contact <a href="mailto:info@piedmontbaseball.org">info@piedmontbaseball.org</a> '+
+          'quoting '+esc(rp.groupId||rp.sessionId)+'.</p>';
+      });
+    return true;
+  }
+  if(rp.cancelled&&rp.groupId){
+    stage.innerHTML='<h2>Your registration is saved</h2>'+
+      '<p class="sub">You have not been charged. Finish paying whenever you are ready '+
+      '&mdash; nothing is lost.</p>'+
+      '<button class="primary" id="resumeBtn" style="width:100%">Continue to payment</button>'+
+      '<div id="resumeErr"></div>';
+    wireResume(rp.groupId);
+    return true;
+  }
+  return false;
+}
+
+function wireResume(groupId){
+  var rp={groupId:groupId};
+  document.getElementById('resumeBtn').onclick=function(){
+      var b=this; b.disabled=true; b.textContent='One moment…';
+      /* quote first: it creates nothing and returns the amount, so a family whose
+         price moved sees the new figure BEFORE anything charges them. */
+      fetch(BACKEND_URL,{method:'POST',body:JSON.stringify(
+        {env:ENV,action:'quote',groupId:rp.groupId})})
+        .then(function(r){return r.json();})
+        .then(function(q){
+          if(!q||!q.ok) throw new Error((q&&q.error)||'Could not load your registration.');
+          return fetch(BACKEND_URL,{method:'POST',body:JSON.stringify(
+            {env:ENV,action:'pay',groupId:rp.groupId,
+             quotedTotalCents:q.quotedTotalCents,returnUrl:location.href})})
+            .then(function(r){return r.json();});
+        })
+        .then(function(d){
+          if(d&&d.ok&&d.checkoutUrl){
+            /* Same silent-refusal problem as submit, and worse here: this branch used
+               to return unconditionally, leaving the button disabled on "One moment…"
+               with no link and no error. Paint the escape hatch, then navigate. */
+            document.getElementById('resumeErr').innerHTML='<div class="enf" '+
+              'style="text-align:left">If you are not taken to the payment page '+
+              'automatically, <a href="'+esc(d.checkoutUrl)+'" target="_top" '+
+              'rel="noopener">open it here</a>.</div>';
+            b.disabled=false; b.textContent='Continue to payment';
+            goToCheckout(d.checkoutUrl); return;
+          }
+          if(d&&d.repriced){
+            document.getElementById('resumeErr').innerHTML='<div class="enf" '+
+              'style="text-align:left">'+esc(d.message)+' The amount is now <b>'+
+              money(d.quotedTotalCents)+'</b>. Press Continue again to pay it.</div>';
+            b.disabled=false; b.textContent='Continue to payment'; return;
+          }
+          throw new Error((d&&d.error)||'Could not start payment.');
+        })
+        .catch(function(e){
+          document.getElementById('resumeErr').innerHTML=
+            '<div class="valerr">'+esc(e.message)+'</div>';
+          b.disabled=false; b.textContent='Continue to payment';
+        });
+    };
+}
+
+function boot(){
+  var stage=document.getElementById('stage');
+  /* BEFORE handleReturn, because the return screens never reach the config fetch and
+     renderBanner used to live only inside it -- so the hardcoded TEST MODE markup
+     ("registrations here do not count") rendered above the receipt of every family who
+     had just paid, in production, 100% of the time. renderBanner is CFG-free, and
+     success_url/cancel_url always carry &env=, so ENV_EXPLICIT is true here. */
+  renderBanner();
+  // BEFORE the config fetch and before the version gate. See handleReturn.
+  if(handleReturn(stage)) return;
+  stage.innerHTML='<h2>Loading…</h2><p class="sub">Fetching current registration fees.</p>';
+  var u=BACKEND_URL+'?env='+ENV+(NOW_OVERRIDE?'&now='+encodeURIComponent(NOW_OVERRIDE):'');
+  fetch(u).then(function(r){ return r.json(); }).then(function(c){
+    if(!c||!c.ok) throw new Error('bad config');
+    CFG=c;
+    renderBanner();
+    if(c.formVersion!==FORM_VERSION){
+      var framed=true; try{ framed=(window.top!==window.self); }catch(e){}
+      var store=null; try{ store=window.sessionStorage; }catch(e){}
+      var home=(location.hostname===TEST_HOST)?TEST_FORM_URL:CURRENT_FORM_URL;
+      var fwd=staleFormForward({ framed:framed, search:location.search, storage:store,
+                                 env:ENV, explicit:ENV_EXPLICIT, nowMs:Date.now(), formUrl:home });
+      if(fwd){
+        stage.innerHTML='<h2>Opening the current form…</h2><p class="sub">This copy is out of '+
+          'date. If nothing happens, <a href="'+fwd+'">open the current form</a>.</p>';
+        location.replace(fwd);
+        return;
+      }
+      stage.innerHTML=staleFormScreen(home);
+      return;
+    }
+    if(!CFG.open){
+      stage.innerHTML='<h2>Registration is closed</h2><p class="sub">Spring 2027 registration is no '+
+        'longer accepting entries. Questions: <a href="mailto:'+CFG.registrarEmail+'">'+
+        CFG.registrarEmail+'</a></p>';
+      return;
+    }
+    render();
+  }).catch(function(){
+    renderBanner();
+    stage.innerHTML='<h2>Registration is temporarily unavailable</h2>'+
+      '<p class="sub">We could not load current fees. Please try again in a few minutes.</p>';
+  });
+}
+
+/* Issue #42: a stale copy -- its FORM_VERSION no longer matches the backend's -- sends the
+   family to the current form on load, before they have typed anything, instead of
+   dead-ending them (PBSF Registrar, 2026-10-27). The submit-time check in Code.gs still only
+   returns its message: by then the family has typed everything, and forwarding would lose it.
+   - TOP LEVEL ONLY. Framed in the Wix embed, location.replace would load the live form inside
+     a test-mode embed; there the message carries a target=_top button instead, which a click
+     is allowed to use to leave the frame.
+   - AT MOST ONCE. The forward adds fwd=<ms>, which also gets past the browser's and the CDN's
+     caches (Pages serves max-age=600, so a plain reload can hand back this same stale copy).
+     A page that arrives with fwd=, or inside the session guard, shows the message instead of
+     forwarding again: right after a version bump, before the new form is published, every copy
+     is stale, and a second hop would be a loop. Storage that throws (some private modes)
+     means no forward at all -- a message is never worse than a loop.
+   - Explicit test mode (env=test, and now=) survives the hop, so a tester stays in the
+     sandbox; anything else lands on the plain, live address.
+   Returns the URL to replace() to, or null to show staleFormScreen(). */
+var CURRENT_FORM_URL='https://register.piedmontbaseball.org/';
+var TEST_FORM_URL='https://register-test.piedmontbaseball.org/';   // a stale DEV copy goes here
+function staleFormForward(o){
+  if(o.framed||!o.storage) return null;
+  var qs=new URLSearchParams(o.search||'');
+  if(qs.get('fwd')) return null;
+  try{
+    var last=Number(o.storage.getItem('pbsfStaleForward')||0);
+    if(last&&o.nowMs-last<30*60*1000) return null;
+    o.storage.setItem('pbsfStaleForward',String(o.nowMs));
+  }catch(e){ return null; }
+  var q=[];
+  if(o.env==='test'&&o.explicit){
+    q.push('env=test');
+    if(qs.get('now')) q.push('now='+encodeURIComponent(qs.get('now')));
+  }
+  q.push('fwd='+o.nowMs);
+  return (o.formUrl||CURRENT_FORM_URL)+'?'+q.join('&');
+}
+function staleFormScreen(formUrl){
+  var u=formUrl||CURRENT_FORM_URL;
+  return '<h2>This form is out of date</h2><p class="sub">You may be viewing a saved copy. '+
+    'Please start again from <a href="'+u+'" target="_top">'+
+    u.replace(/^https:\/\/|\/$/g,'')+'</a>.</p>'+
+    '<div class="nav"><a class="primary btnlink" href="'+u+'" target="_top">'+
+    'Go to the current form</a></div>';
+}
+
+function renderBanner(){
+  var el=document.querySelector('.proto');
+  if(ENV==='prod'&&ENV_EXPLICIT){ el.style.display='none'; return; }
+  var unset=!ENV_EXPLICIT;
+  el.style.background=unset?'#fdecea':'#fff8e6';
+  el.style.color=unset?'#8a1c10':'#6b5410';
+  el.style.borderBottomColor=unset?'#f3c4ad':'#f0e2b8';
+  el.textContent=unset
+    ? '⚠ ENVIRONMENT NOT SET — running in TEST MODE. Registrations here do not count.'
+    : '🧪 '+(location.hostname===TEST_HOST?'TEST SITE (development version) — ':'')+'TEST MODE'+
+      (NOW_OVERRIDE?' — simulating '+NOW_OVERRIDE:'')+' — registrations here do not count.';
+}
+/* Must match cfg.formVersion from the backend. The Wix embed URL is content-hashed,
+   so editing this file mints a new URL while the old one keeps serving old code
+   forever -- this constant is what makes a stale copy refuse to run rather than
+   quietly take a payment against outdated logic. Bump both together. */
+var FORM_VERSION='2027-spring-1';
+
+/* No fee table lives here any more. Prices come from the backend, which is the only
+   thing that can be trusted with a clock-dependent price, and having one copy means
+   a fee change is a script-property edit rather than a redeploy. */
+var CFG=null;
+var QS=new URLSearchParams(location.search);
+/* Which Stripe/sheet environment this page talks to, and whether that was asked for.
+   register.piedmontbaseball.org IS the live form (ADR 0016): families get the plain
+   address, so there a missing env means prod. Everywhere else -- the Wix embed, a bare
+   filesusr link, a github.io preview -- a missing env still means TEST behind the red
+   banner, as it always has. An explicit env= wins on every host. */
+var LIVE_HOST='register.piedmontbaseball.org';
+/* register-test.piedmontbaseball.org is the development site: a copy of this file, published
+   from the `dev` branch with BACKEND_URL pointing at a separate DEV backend that holds only
+   Stripe's TEST key and its own sheet. On that host the form is ALWAYS in test mode, whatever
+   the address says, so a development version can never ask for live mode. */
+var TEST_HOST='register-test.piedmontbaseball.org';
+function resolveFormEnv(env,host){
+  if(host===TEST_HOST) return {env:'test',explicit:true};
+  if(env==='prod'||env==='test') return {env:env,explicit:true};
+  if(!env&&host===LIVE_HOST) return {env:'prod',explicit:true};
+  return {env:'test',explicit:false};
+}
+var _FE=resolveFormEnv(QS.get('env'),location.hostname);
+var ENV=_FE.env;
+var ENV_EXPLICIT=_FE.explicit;
+var NOW_OVERRIDE=(ENV==='test')?QS.get('now'):null;
+var TOTAL_STEPS=5;
+
+/* Bumped with the 8 -> 5 regroup. No wording changed, but what a family
+   acknowledged as a single act did, and a record that cannot say which
+   grouping it was signed under is a record that cannot be relied on. */
+var WAIVER_VERSION='2026-fall-3';
+var WAIVERS=[
+ {
+  "key": "medical",
+  "title": "Parent Medical Release Form",
+  "mode": "signature",
+  "link": null,
+  "body": "I, hereby approve and consent to participation of the above registered player (\"Player\") in Baseball/Softball, league activities,\nincluding tryout/evaluation activities, (collectively, \"Activities\") of the Piedmont Baseball and Softball Foundation (\"PBSF\") and\nits affiliated leagues. I hereby grant permission to PBSF or other league representatives to authorize and obtain medical care,\nincluding emergency medical or dental treatment from any physician, hospital or medical clinic should the Player become ill\nor injured while participating in those Activities. I assume all risks and hazards incident to such participation and do hereby\nwaive, release and hold harmless PBSF, any leagues affiliated with PBSF in their programs and their organizer, board\nmembers, officers, agents, coaches, sponsors, umpires, participants and person transporting the Player to and from Activities\nfrom any and all claims, demands, actions and uses of action (\"Claims\") arising out of any injury to the Player including any\nClaims by the Player. I represent that I have the authority to electronically sign this authorization and release and contract to\nindemnify on behalf of myself and the Player."
+ },
+ {
+  "key": "concussion",
+  "title": "Concussion Waiver",
+  "mode": "signature",
+  "link": null,
+  "body": "Recently, California adopted a new law (AB 2007) which requires certain youth sports organizations to adopt certain\nconcussion protocols.\n1.    The law requires an athlete who may have a concussion during a practice or game to be removed from the activity for\nthe remainder of the day.\n2.   Any athlete removed for this reason must receive a written note from a medical doctor trained in the management of\nconcussions before returning to practice or games.\n3.     Please read and understand the concussion information sheet and share this information with your family. We require\nall players, parents, and coaches to adhere to all aspects of the protocol.\nFor the latest information on concussions visit https://www.cdc.gov/headsup/"
+ },
+ {
+  "key": "covid",
+  "title": "COVID-19 Participation Waiver",
+  "mode": "signature",
+  "link": null,
+  "body": "The novel coronavirus, COVID-19, has been declared a worldwide pandemic by the World Health Organization. COVID-19 is extremely contagious and is believed to spread mainly from person-to-person contact. As a result, federal, state, and local governments and federal and state health agencies recommend social distancing and have, in many locations, prohibited the congregation of groups of people.\nPiedmont Baseball Softball Foundation (PBSF) is a nonprofit providing service to youth of Piedmont through recreational baseball and softball programs dedicated to fostering skills and love of the game in all interested and committed players.  PBSF has put in place preventative measures to reduce the spread of COVID-19; however, PBSF cannot guarantee that you or your child(ren) will not become infected with COVID-19.\nAll PBSF activities will be structured to abide by current COVID-19 guidelines issued by the Alameda County in the state of California. PBSF will continue to update protocols as guidance evolves. Participant(s) willingly agree to comply with all stated protocols and terms and conditions for participation specifically as it pertains to protection against COVID-19 and matters of general safety.\nParticipation with PBSF could increase your risk, and the risk of others you come in contact with, of contracting COVID-19. By signing this agreement, you acknowledge the contagious nature of COVID-19 and voluntarily assume the risk that your child(ren) may be exposed to or infected by COVID-19 by participation and that such exposure or infection may result in personal injury, illness, permanent disability, and death. You understand that the risk of becoming exposed to or infected by COVID-19 during sessions may result from the actions, omissions, or negligence of you and others, including, but not limited to, PBSF’s coaches, volunteers, and other program participants and their families.\nYou voluntarily agree to assume all of the foregoing risks and accept sole responsibility for any injury to your child(ren) (including but not limited to, personal injury, disability, and death), illness, damage, loss, claim, liability, or expense, of any kind, that you or your child(ren) may experience or incur in connection with your child(ren)’s participation with PBSF (“Claims”). On your behalf, and on behalf of your children, you hereby release, covenant not to sue, discharge, and hold harmless PBSF, its employees, agents, and representatives, of and from the Claims, including all liabilities, claims, actions, damages, costs or expenses of any kind arising out of or relating thereto. You understand and agree that this release includes any Claims based on the actions, omissions, or negligence of PBSF, its employees, agents, and representatives, whether a COVID-19 infection occurs before, during, or after participation in any PBSF event.\nThe initials below certifies that, as parent/guardian with legal responsibility for the participant(s) named above, I have read and explained the provisions in this waiver/release to my child/ward including the risks of presence and participation and his/her personal responsibilities for adhering to the rules and regulations for protection against communicable diseases. My initials as parent and/or guardian understands and accepts these risks and responsibilities and consent and agree to our child(ren)’s release and agree to indemnify and hold harmless PBSF for any and all liabilities incident to my minor child’s/ward’s presence or participation in these activities as provided above, EVEN IF ARISING FROM THEIR NEGLIGENCE, to the fullest extent provided by law.\nThe undersigned further expressly agrees that the attached waiver and assumption of risks agreement is intended to be as broad and inclusive as is permitted by law and that if any portion thereof is held invalid, it is agreed that the balance shall, notwithstanding, continue in full legal force and effect."
+ },
+ {
+  "key": "rules",
+  "title": "League Rules & Policies",
+  "mode": "signature",
+  "link": "https://decfc883-3fdc-4f2e-a7a0-916261d909a8.filesusr.com/ugd/2075a3_fe7ab4088da4447f85f45398c87d3636.pdf",
+  "body": "General Information\nRegistering in a division other than for your age is not allowed. By acknowledging, you agree to pay the higher fee even if\nyour child is moved to the correct division.\nWe cannot accommodate requests to play with specific players and/or coaches.\nAdditional General Info can be found here: https://www.piedmontbaseball.org/\n\nCode of Conduct\nPlease share this code of conduct with your family. We require all players, parents, and coaches to adhere to all aspects of\nthe code.\n\nPBSF League Guidelines\nPlease read the Frequently Asked Questions (FAQ) which lists, among other things, participant and parent expectations.\nhttps://www.piedmontbaseball.org/faq\n\nRegistration Policies\nRead the Registration, Fee, and Player Commitment Policies,\nhttp://www.piedmontbaseball.org/resources/reg-policies/"
+ },
+ {
+  "key": "photo",
+  "title": "Photo Consent",
+  "mode": "signature",
+  "link": null,
+  "body": "I give consent for the registered player to be photographed while participating in any baseball/softball activities and the\nresulting photos to be used by the Piedmont Baseball Softball Foundation for promotional purposes."
+ }
+];
+var RELATIONS=['','Mother','Father','Guardian','Other'];
+var SHIRTS=['','Youth S','Youth M','Youth L','Adult S','Adult M','Adult L'];
+var COACH =['','No','Head coach','Assistant coach','Team parent'];
+var SCHOOLS=['','Beach','Havens','Wildwood','Corpus Christi','Piedmont Middle School',
+  'Bentley','Head Royce',"St. Paul's",'Other Elementary','Other Middle School'];
+
+function blankPlayer(){ return {first:'',last:'',dob:'',gender:null,sport:null,sportAuto:false,grade:'',
+  school:'',shirt:'',considerCoaching:'',friendRequest:'',notes:''}; }
+
+/* shared = entered once per family; players = one entry per child. Siblings share an
+   address, a policy and a doctor, so those live in shared -- that split IS the feature. */
+var s={ step:0,
+  shared:{ addr:'',city:'',state:'CA',zip:'',
+           p1name:'',p1rel:'',p1email:'',p1cell:'',
+           p2name:'',p2rel:'',p2email:'',p2cell:'',
+           ec_name:'',ec_phone:'',
+           hospital:'',physName:'',physPhone:'',
+           insCarrier:'',policyHolder:'',policyNumber:'',
+           donation:'' },
+  players:[ blankPlayer() ],
+  waivers:{},
+  intro:true,
+  paid:false };
+
+var MAX_PLAYERS=8;   // matches the server; Stripe also caps line items
+
+var GRADES=[['',''],['PK','Pre-K'],['K','Kindergarten'],['1','1st'],['2','2nd'],['3','3rd'],
+  ['4','4th'],['5','5th'],['6','6th'],['7','7th'],['8','8th']];
+
+/* ---- Program eligibility and the combo discount: COPIED VERBATIM from Pricing.gs.
+   test/spring.test.js asserts each function here is character-for-character the
+   server's, so the price a family is shown cannot drift from the price they are
+   charged. Edit Pricing.gs, then re-copy. Never edit these here. ---- */
+function gradeKey(grade) {
+  if (typeof grade !== 'number' && typeof grade !== 'string') return null;
+  var g = String(grade);
+  return /^(PK|K|[1-8])$/.test(g) ? g : null;
+}
+function divisionFor(sport, grade, cfg) {
+  var table = (cfg.divisions || {})[sport];
+  if (!table) return null;
+  var g = gradeKey(grade);
+  return g === null ? null : (table[g] || null);
+}
+function eligiblePrograms(player, cfg) {
+  var p = player || {}, out = [], g = gradeKey(p.grade);
+  if (g === null) return out;
+  var bb = divisionFor('Baseball', g, cfg);
+  if (bb && (p.gender === 'Male' || p.gender === 'Female')) {
+    out.push({ division: bb, sport: 'Baseball', school: false });
+  }
+  var sb = (p.gender === 'Female') ? divisionFor('Softball', g, cfg) : null;
+  if (sb) out.push({ division: sb, sport: 'Softball', school: false });
+  var sp = cfg.schoolPrograms || {};
+  for (var name in sp) {
+    var r = sp[name];
+    if (r.gender === p.gender && (r.grades || []).indexOf(g) >= 0 &&
+        String(p.school || '') === r.school) {
+      out.push({ division: name, sport: r.sport, school: true });
+    }
+  }
+  return out;
+}
+function isMultiProgramGrade(grade, cfg) {
+  var g = gradeKey(grade);
+  return g !== null && (cfg.multiProgramGrades || []).indexOf(g) >= 0;
+}
+function programMixProblem(programs) {
+  var rec = 0, school = 0;
+  for (var i = 0; i < programs.length; i++) {
+    if (programs[i].school) school++; else rec++;
+  }
+  if (!programs.length) return 'pick at least one program';
+  if (rec > 1) return 'only one rec program per player';
+  if (school > 1) return 'only one school program per player';
+  return null;
+}
+function comboDiscountIndex(programs, fees, cfg) {
+  if (!(cfg.comboDiscountPercent > 0)) return -1;
+  var hasSchool = false, hasRec = false, i;
+  for (i = 0; i < programs.length; i++) {
+    if (programs[i].school) hasSchool = true; else hasRec = true;
+  }
+  if (!hasSchool || !hasRec) return -1;
+  var best = -1;
+  for (i = 0; i < programs.length; i++) {
+    if (best < 0 || fees[i] < fees[best] ||
+        (fees[i] === fees[best] && programs[i].school && !programs[best].school)) best = i;
+  }
+  return best;
+}
+function comboDiscountCents(feeCents, cfg) {
+  return Math.round(feeCents * (cfg.comboDiscountPercent || 0) / 100);
+}
+function processingSupportCents(cents, cfg) {
+  var amount = Math.round(Number(cents) || 0);
+  if (amount <= 0) return 0;
+  var rate = cfg.processingFeeRate, fixed = cfg.processingFeeFixedCents;
+
+  // The algebra gives the real-valued answer; Stripe then charges an INTEGER fee it
+  // rounds itself, so the algebraic ceiling can overshoot by a cent. On $275 the
+  // closed form yields 853 while 852 already nets exactly $275.00 -- caught by the
+  // golden, which is the argument for keeping goldens next to a formula.
+  //
+  // So: start below and walk up to the SMALLEST addition that leaves the league
+  // whole. Bounded to a few iterations, and exact by construction rather than by
+  // rounding luck.
+  var add = Math.floor((amount + fixed) / (1 - rate)) - amount - 1;
+  if (add < 0) add = 0;
+  for (var i = 0; i < 8; i++) {
+    var charge = amount + add;
+    var net = charge - (Math.round(charge * rate) + fixed);
+    if (net >= amount) return add;
+    add++;
+  }
+  return add;
+}
+function mandatoryProcessingCents(baseCents, cfg) {
+  var exact = processingSupportCents(baseCents, cfg);
+  var step = Math.round(Number(cfg.processingFeeRoundToCents) || 1);
+  if (step < 1) step = 1;
+  return Math.ceil(exact / step) * step;
+}/* ---- end of the verbatim copy ---- */
+
+/* What a family READS for a division. Display only: the division KEY ("PMS Baseball") is
+   what config, the Stripe product map, the payload and the sheet use, and it never
+   changes here. Parents did not all know "PMS" meant Piedmont Middle School. */
+var DIVISION_LABELS={'PMS Baseball':'PMS (Piedmont Middle School) Baseball',
+                     'PMS Softball':'PMS (Piedmont Middle School) Softball'};
+function divLabel(d){ return DIVISION_LABELS[d]||d; }
+function pSport(p){ return p.gender==='Male'?'Baseball':p.sport; }
+/* The sport the form picks for a child before the parent does: boys play baseball, and
+   girls default to SOFTBALL -- most girls here play it -- except where this grade has no
+   softball division (Pre-K: softball starts at 6U in K), where it is baseball (Shetland).
+   With no grade yet, softball. A default only; a girl can always switch to baseball. */
+function autoSport(gender,grade,cfg){
+  if(gender==='Male') return 'Baseball';
+  if(gender!=='Female') return null;
+  return (gradeKey(grade)!==null&&!divisionFor('Softball',grade,cfg))?'Baseball':'Softball';
+}
+/* Apply that default -- but never over a sport the parent picked themselves. sportAuto
+   records which it is, so switching Male->Female replaces the automatic Baseball, a grade
+   change re-derives an automatic choice (K softball -> Pre-K baseball), and a parent's own
+   tap survives both. Boys are forced to Baseball; a girl's own Baseball choice is kept
+   marked as hers, so a slip to Male and back does not lose it. */
+function applyAutoSport(p){
+  if(p.gender==='Male'){ if(p.sport!=='Baseball'){ p.sport='Baseball'; p.sportAuto=true; } return; }
+  /* Leaving program mode (e.g. the school changed away from PMS): a rec program the parent
+     ticked there IS their sport choice -- carry it over rather than defaulting a Pony girl
+     to Softball behind their back. */
+  if(p.gender==='Female'&&p.programs&&p.programs.length&&!pMulti(p)){
+    var g=gradeKey(p.grade), bb=divisionFor('Baseball',g,CFG), sb=divisionFor('Softball',g,CFG);
+    for(var i=0;i<p.programs.length;i++){
+      if(p.programs[i]===bb||p.programs[i]===sb){
+        p.sport=(p.programs[i]===bb)?'Baseball':'Softball'; p.sportAuto=false; p.programs=[]; return; }
+    }
+  }
+  if(p.gender==='Female'&&(!p.sport||p.sportAuto)){
+    p.sport=autoSport('Female',p.grade,CFG); p.sportAuto=true; }
+}
+function pDivision(p){ var sp=pSport(p); if(!sp||!p.grade||!CFG) return null;
+  return divisionFor(sp,p.grade,CFG); }
+/* Does this child tick programs rather than pick one sport? Only in a multi-program grade
+   AND only when a school program is on offer: without one, a child has one rec program,
+   which is just the ordinary sport choice. */
+function pMulti(p){ if(!(CFG&&p.gender&&isMultiProgramGrade(p.grade,CFG))) return false;
+  var el=eligiblePrograms(p,CFG);
+  for(var i=0;i<el.length;i++) if(el[i].school) return true;
+  return false; }
+/* The programs this child is registering for: [{division,sport,school}]. */
+function pPrograms(p){
+  if(!CFG||!p.gender||gradeKey(p.grade)===null) return [];
+  if(pMulti(p)){
+    var el=eligiblePrograms(p,CFG), want=p.programs||[], out=[];
+    for(var i=0;i<el.length;i++) if(want.indexOf(el[i].division)>=0) out.push(el[i]);
+    return out;
+  }
+  var sp=pSport(p), d=sp?divisionFor(sp,p.grade,CFG):null;
+  return d?[{division:d,sport:sp,school:false}]:[];
+}
+/* One line per program, in cents, with the combo discount applied the server's way. */
+function pEntries(p){
+  var pr=pPrograms(p), fees=[], out=[], i;
+  if(programMixProblem(pr)) return [];   // the server refuses it, so it is never quoted
+  for(i=0;i<pr.length;i++) fees.push(CFG.fees[pr[i].division]);
+  var disc=comboDiscountIndex(pr,fees,CFG);
+  for(i=0;i<pr.length;i++){
+    var c=Math.round((fees[i]||0)*100), off=(i===disc)?comboDiscountCents(c,CFG):0;
+    out.push({division:pr[i].division,sport:pr[i].sport,cents:c-off,off:off});
+  }
+  return out;
+}
+function pFeeCents(p){ return pEntries(p).reduce(function(t,e){ return t+e.cents; },0); }
+function entryCount(){ return s.players.reduce(function(t,p){ return t+pEntries(p).length; },0); }
+/* Spring's required processing fee: Stripe's exact cost on the whole order, rounded up to
+   the dollar -- the server's own functions, above. When it is on, fall's voluntary
+   support box is gone. It moves with the donation, so it is recomputed on every paint. */
+function procMandatory(){ return !!(CFG&&CFG.processingFeeMandatory); }
+function procCents(){ return procMandatory()
+  ?mandatoryProcessingCents(subtotalCents()+Math.round(donationNum()*100),CFG):0; }
+function totalCents(){ return subtotalCents()+Math.round(donationNum()*100)+procCents(); }
+/* Every program line, plus the processing fee -- the review step and its in-place repaint
+   share this so the two can never disagree. */
+function entryLines(){
+  var h='';
+  for(var j=0;j<s.players.length;j++){ var q=s.players[j], es=pEntries(q);
+    for(var k=0;k<es.length;k++){
+      h+='<div class="frow"><span class="rl">'+esc(q.first)+' '+esc(q.last)+' &middot; '+
+        esc(divLabel(es[k].division))+(es[k].off?' <span class="chip">2nd program &minus;'+
+        CFG.comboDiscountPercent+'%</span>':'')+'</span><span>'+money(es[k].cents)+
+        '</span></div>';
+    }
+  }
+  if(procCents()) h+='<div class="frow"><span class="rl">Processing fee &middot; card '+
+    'processing cost</span><span>'+money(procCents())+'</span></div>';
+  return h;
+}
+/* The tier is resolved server-side; the client only reports it. tierEndsAtLabel is
+   preformatted by the server because a browser would render the -07:00 offset in its
+   own timezone and show an out-of-state family the wrong deadline. */
+function tierNote(){
+  if(!CFG) return '';
+  if(CFG.tier==='early') return '<div class="frow"><span class="rl">Early bird</span>'+
+    '<span style="color:var(--ok);font-weight:700">saves $'+Math.abs(CFG.tierAdjust)+
+    (CFG.tierEndsAtLabel?' &middot; ends '+CFG.tierEndsAtLabel:'')+'</span></div>';
+  if(CFG.tier==='late') return '<div class="frow"><span class="rl">Late registration</span>'+
+    '<span style="color:var(--warn);font-weight:700">+$'+CFG.tierAdjust+'</span></div>';
+  return '';
+}
+/* $5,000, matching MAX_DONATION_CENTS in Pricing.gs. test/donation.test.js asserts the
+   two agree -- this is a second copy of a server rule, which is exactly the shape that
+   drifts, so it is pinned by a test rather than by a comment. */
+var MAX_DONATION=5000;
+/** One parse, used by the field, the fee box and the payload. '' for anything unusable. */
+function donationRaw(){ return String(s.shared.donation||'').trim().replace(/[$,]/g,''); }
+function donationNum(){ var n=parseFloat(donationRaw()); return (isFinite(n)&&n>0)?Math.round(n*100)/100:0; }
+/* Empty is fine -- the donation is optional. Anything else must be a plain dollar amount
+   within the cap, and must SAY so: the old field silently coerced junk to 0, so a family
+   who typed "fifty" saw their donation vanish from the total with no explanation. */
+function donationError(){
+  var raw=donationRaw();
+  if(!raw) return '';
+  if(!/^\d+(\.\d{1,2})?$/.test(raw))
+    return 'Enter a dollar amount, like 50 or 50.00.';
+  var n=parseFloat(raw);
+  if(n>MAX_DONATION)
+    return 'Donations over $'+MAX_DONATION.toLocaleString()+' need to go through the '+
+           'registrar. Please leave this blank and email '+
+           ((CFG&&CFG.registrarEmail)||'info@piedmontbaseball.org')+'.';
+  return '';
+}
+/* Dollars for display, via money(): a 50% combo line can be $212.50, and '$'+number
+   printed that as "$212.5". */
+function total(){ return money(totalCents()); }
+
+function renderSteps(){ var el=document.getElementById('steps'); el.innerHTML='';
+  for(var i=0;i<TOTAL_STEPS;i++){ var d=document.createElement('div');
+    d.className='dot'+(i<s.step?' done':'')+(i===s.step?' on':''); el.appendChild(d);} }
+
+function esc(v){return (v==null?'':String(v)).replace(/[<>&"]/g,function(c){
+  return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];});}
+
+/* THE BINDING CONVENTION. f_<key> writes shared[key]; f_p<i>_<key> writes players[i][key].
+   A field whose id does not match simply never persists and nothing errors -- this is the
+   single most likely source of silent breakage in the whole form, which is why the
+   round-trip test exists. */
+/* The asterisk was the ONLY signal that a field was required, and nothing anywhere said
+   what it meant -- a parent registering for real told us they did not know. Shown once
+   per step, above the first field, on the two steps that have required fields. */
+function reqLegend(){ return '<p class="help" style="margin:-2px 0 10px">Fields marked '+
+  '<span class="req">*</span> are required.</p>'; }
+
+/* aria-required carries the requirement for anyone the colour cannot reach, and the
+   asterisk is hidden from assistive tech so it is not read out as a bare "star" with no
+   meaning attached. Both helpers already thread `req`, so this is one argument. */
+function reqMark(req){ return req?' <span class="req" aria-hidden="true">*</span>':''; }
+function reqAttr(req){ return req?' aria-required="true"':''; }
+function sfield(label,key,type,req,ph,attrs){ return '<div class="q"><label class="qt">'+label+
+  reqMark(req)+'</label><input id="f_'+key+'" type="'+(type||'text')+'"'+reqAttr(req)+
+  (attrs||'')+' placeholder="'+(ph||'')+'" value="'+esc(s.shared[key])+'"></div>'; }
+function pfield(i,label,key,type,req,ph,attrs){ return '<div class="q"><label class="qt">'+label+
+  reqMark(req)+'</label><input id="f_p'+i+'_'+key+'" type="'+(type||'text')+'"'+reqAttr(req)+
+  (attrs||'')+' placeholder="'+(ph||'')+'" value="'+esc(s.players[i][key])+'"></div>'; }
+function sel(id,cur,arr,req){ return '<select id="'+id+'"'+reqAttr(req)+'>'+arr.map(function(v){
+  /* [value,label] pairs where the stored value is not what a parent reads ('PK' is
+     shown as Pre-K); a bare value is both. */
+  var val=Array.isArray(v)?v[0]:v, lab=Array.isArray(v)?v[1]:v;
+  return '<option value="'+esc(val)+'"'+(String(cur)===String(val)?' selected':'')+'>'+lab+
+    '</option>';}).join('')+'</select>'; }
+
+function bindInputs(){
+  Array.prototype.forEach.call(document.querySelectorAll('input[id^="f_"],select[id^="f_"],textarea[id^="f_"]'),
+  function(el){
+    var id=el.id.slice(2), m=id.match(/^p(\d+)_(.+)$/);
+    var h=function(){
+      if(m){ var i=Number(m[1]); if(s.players[i]) s.players[i][m[2]]=el.value; }
+      else { s.shared[id]=el.value; }
+      /* Grade selects the division and therefore the price, so the card has to be
+         redrawn -- updateNext() alone would leave the fee box stale or absent.
+         Text inputs deliberately do NOT re-render: that would drop focus mid-word. */
+      // Grade/school redraw the card; refocus, or arrowing through the select loses focus.
+      if(m && (m[2]==='grade' || m[2]==='school') && s.players[Number(m[1])])
+        applyAutoSport(s.players[Number(m[1])]);
+      if(m && (m[2]==='grade' || m[2]==='school')){
+        render(); var again=document.getElementById(el.id); if(again) again.focus(); }
+      // Donation used to render() here, destroying the field mid-word. It repaints the
+      // error and the totals in place instead.
+      else if(id==='donation') paintDonation();
+      else { updateNext(); if(s.step===0) paintErrors(); }
+    };
+    el.oninput=h; el.onchange=h;
+  });
+}
+
+/* Mirrors normalizeDob() in Pricing.gs -- test/dob.test.js asserts the two agree on
+   every case, because two parsers for one format is exactly the shape that drifts. */
+/* NO local copy of the year window. It rolls each season, and two copies of a rolling
+   rule is a rule that drifts on New Year's Day in whichever copy nobody remembered.
+   doGet computes it from the same clock that resolves the tier and sends it down. */
+function birthYears(){
+  return { min:(CFG&&CFG.minBirthYear)||null, max:(CFG&&CFG.maxBirthYear)||null };
+}
+function normalizeDob(raw){
+  var v=String(raw==null?'':raw).trim();
+  if(!v) return null;
+  var m,y,mo,d;
+  if((m=v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/))){ y=+m[1]; mo=+m[2]; d=+m[3]; }
+  else if((m=v.match(/^(\d{1,2})[\/\-. ]+(\d{1,2})[\/\-. ]+(\d{4})$/))){ mo=+m[1]; d=+m[2]; y=+m[3]; }
+  else if((m=v.match(/^(\d{2})(\d{2})(\d{4})$/))){ mo=+m[1]; d=+m[2]; y=+m[3]; }
+  else return null;
+  if(mo<1||mo>12||d<1||d>31) return null;
+  var dt=new Date(Date.UTC(y,mo-1,d));
+  if(dt.getUTCFullYear()!==y||dt.getUTCMonth()!==mo-1||dt.getUTCDate()!==d) return null;
+  function pad(n){ return (n<10?'0':'')+n; }
+  return y+'-'+pad(mo)+'-'+pad(d);
+}
+/** Mirrors dobProblem() in Pricing.gs. '' when fine; "invalid" tells a parent nothing. */
+function dobError(p){
+  var raw=String(p.dob||'').trim();
+  if(!raw) return '';                          // handled as "needs a birthdate"
+  var iso=normalizeDob(raw);
+  if(!iso) return 'We could not read that as a date. Please use mm/dd/yyyy \u2014 for '+
+                  'example 05/14/2016. Slashes, dashes or spaces all work.';
+  var w=birthYears();
+  if(!w.min||!w.max) return '';                // server did not say; do not invent a rule
+  var y=+iso.slice(0,4);
+  if(y<w.min) return 'That is a '+y+' birth year, which would make them too old for '+
+                     'this season. Please check the year \u2014 if it is right, email '+
+                     ((CFG&&CFG.registrarEmail)||'info@piedmontbaseball.org')+
+                     ' rather than registering here.';
+  if(y>w.max) return 'That is a '+y+' birth year, which would make them too young for '+
+                     'this season. Please check the year.';
+  return '';
+}
+/** mm/dd/yyyy for display, from anything normalizeDob accepts. '' if unusable. */
+function dobDisplay(raw){
+  var iso=normalizeDob(raw);
+  if(!iso) return '';
+  return iso.slice(5,7)+'/'+iso.slice(8,10)+'/'+iso.slice(0,4);
+}
+
+/* Returns a human sentence naming WHICH child is blocking, or null. A disabled button
+   with no explanation is the worst version of validation. */
+function playerProblem(i){
+  var p=s.players[i], who='Player '+(i+1)+(p.first?' ('+p.first+')':'');
+  if(!p.first||!p.last) return who+' needs a first and last name';
+  if(!p.dob) return who+' needs a birthdate';
+  var de=dobError(p); if(de) return who+': '+de;
+  if(!p.gender) return who+' needs a gender';
+  if(!p.grade) return who+' needs a grade';
+  /* School before programs: PMS eligibility depends on it. */
+  if(!p.school) return who+' needs a school';
+  if(pMulti(p)){
+    var mix=programMixProblem(pPrograms(p));
+    if(mix) return who+': '+mix;
+  } else {
+    if(!pSport(p)) return who+' needs a sport';
+    if(!pDivision(p)) return who+' has no division for that sport and grade';
+  }
+  if(!p.shirt) return who+' needs a shirt size';
+  return null;
+}
+function firstPlayerProblem(){
+  for(var i=0;i<s.players.length;i++){ var e=playerProblem(i); if(e) return e; }
+  return null;
+}
+
+function addPlayer(){ if(s.players.length<MAX_PLAYERS){ s.players.push(blankPlayer()); render(); } }
+function removePlayer(i){ if(s.players.length>1){ s.players.splice(i,1); render(); } }
+
+function playerCard(i){
+  var p=s.players[i], multi=pMulti(p), es=pEntries(p);
+  var h='<div class="pcard"><div class="phead"><b>Player '+(i+1)+
+    (p.first?' &mdash; '+esc(p.first)+' '+esc(p.last):'')+'</b>'+
+    (s.players.length>1?'<button class="ghost rmbtn" data-rm="'+i+'">Remove</button>':'')+'</div>';
+  h+='<div class="row">'+pfield(i,'First name','first','text',true)+pfield(i,'Last name','last','text',true)+'</div>';
+  /* type=text, not type=date. The native picker opens on TODAY, so reaching a
+     ten-year-old is roughly 120 taps on a phone. Typed entry is faster for every age
+     this league registers.
+
+     And NO inputmode: inputmode="numeric" raises a digits-only keypad, which has no
+     slash on it, so the field could not be completed at all on the very device typed
+     entry was meant to help. The ordinary keyboard has every separator we accept. */
+  h+=pfield(i,'Birthdate','dob','text',true,'mm/dd/yyyy',
+            ' autocomplete="bday" maxlength="10" aria-describedby="dobhint_'+i+'"');
+  /* No year range here. The window is a SANITY BOUND -- wide enough to catch a mistyped
+     year without adjudicating eligibility, which is grade-based and belongs to the league.
+     Printing it read as a rule, and an overly lenient one: it would tell a parent a
+     three-year-old or a sixteen-year-old belongs in Fall Ball. The bound still fires as an
+     error when someone actually trips it, which is the only place it is meaningful. */
+  h+='<div class="help" id="dobhint_'+i+'" style="margin:-8px 0 4px">'+
+     'Slashes, dashes or spaces all work &mdash; we tidy it up.</div>'+
+     /* The message used to appear ONLY in the nav hint under the button -- far from the
+        field, and easy to miss with several children on screen. It belongs where the
+        mistake is. */
+     '<div id="doberr_'+i+'" style="margin:0 0 10px"></div>';
+  h+='<div class="q"><label class="qt">Gender <span class="req" aria-hidden="true">*</span></label>'+
+     '<div class="opts" role="radiogroup" aria-required="true" aria-label="Gender" data-gender="'+i+'">'+
+     '<div class="opt'+(p.gender==='Male'?' sel':'')+'" tabindex="0" role="radio" '+
+       'aria-checked="'+(p.gender==='Male')+'" data-v="Male">Male</div>'+
+     '<div class="opt'+(p.gender==='Female'?' sel':'')+'" tabindex="0" role="radio" '+
+       'aria-checked="'+(p.gender==='Female')+'" data-v="Female">Female</div></div></div>';
+  /* Grade and school come BEFORE sport now: in grades 6-8 they decide which programs
+     a child can tick, and PMS needs the school. */
+  h+='<div class="q"><label class="qt">Grade in school (Pre-K&ndash;8) <span class="req" aria-hidden="true">*</span></label>'+
+     sel('f_p'+i+'_grade',p.grade,GRADES,true)+'</div>';
+  h+='<div class="q"><label class="qt">School <span class="req" aria-hidden="true">*</span></label>'+
+     sel('f_p'+i+'_school',p.school,SCHOOLS,true)+'</div>';
+  if(multi){
+    var el=eligiblePrograms(p,CFG), want=p.programs||[], hasSchool=false;
+    h+='<div class="q"><label class="qt">Programs <span class="req" aria-hidden="true">*</span> '+
+       '<span class="chip">pick one or more</span></label><div role="group" aria-label="Programs">';
+    for(var e=0;e<el.length;e++){
+      if(el[e].school) hasSchool=true;
+      h+='<label class="supportbox"><input type="checkbox" data-prog="'+i+'" data-school="'+
+        (el[e].school?1:0)+'" value="'+
+        esc(el[e].division)+'"'+(want.indexOf(el[e].division)>=0?' checked':'')+'>'+
+        '<span class="sbtext"><b>'+esc(divLabel(el[e].division))+'</b>'+
+        (el[e].school?'':' &middot; '+el[e].sport)+
+        ' &middot; $'+CFG.fees[el[e].division]+'</span></label>';
+    }
+    h+='</div>'+(hasSchool?'<div class="help"><b>PMS teams are for Piedmont Middle School '+
+       'students</b> &mdash; your child must attend Piedmont Middle School to play PMS.</div>':'')+
+       '<div class="help">Pick one rec program, PMS, or one of each &mdash; each is its own '+
+       'registration.'+(hasSchool&&CFG.comboDiscountPercent?' With both, the cheaper of the two is '+
+       CFG.comboDiscountPercent+'% off.':'')+'</div></div>';
+  } else if(p.gender==='Female'){
+    h+='<div class="q"><label class="qt">Sport <span class="req" aria-hidden="true">*</span> '+
+       '<span class="chip">conditional</span></label><div class="opts" role="radiogroup" aria-required="true" aria-label="Sport" data-sport="'+i+'">'+
+       '<div class="opt'+(p.sport==='Baseball'?' sel':'')+'" tabindex="0" role="radio" '+
+         'aria-checked="'+(p.sport==='Baseball')+'" data-v="Baseball">Baseball</div>'+
+       '<div class="opt'+(p.sport==='Softball'?' sel':'')+'" tabindex="0" role="radio" '+
+         'aria-checked="'+(p.sport==='Softball')+'" data-v="Softball">Softball</div></div>'+
+       (gradeKey(p.grade)==='PK'?'<div class="help">Softball starts in Kindergarten, so Pre-K '+
+         'girls play Shetland baseball.</div>':'')+'</div>';
+  } else if(p.gender==='Male'){
+    h+='<div class="lockmsg">Boys play <b>Baseball</b>.</div>';
+  }
+  h+=pmsHint(p);
+  h+='<div class="q"><label class="qt">Shirt size <span class="req" aria-hidden="true">*</span></label>'+
+     sel('f_p'+i+'_shirt',p.shirt,SHIRTS,true)+'</div>';
+  h+='<div class="q"><label class="qt">Interested in coaching?</label>'+
+     sel('f_p'+i+'_considerCoaching',p.considerCoaching,COACH)+'</div>';
+  h+=pfield(i,'Friend request &mdash; softball and Shetland baseball only','friendRequest','text',false,
+    'Name a friend to be placed with');
+  h+=pfield(i,'Availability notes','notes','text',false,'play-down requests go to the commissioners');
+  if(!p.gender||!p.grade){ h+='<div class="help">Pick a gender and grade to see the division and fee.</div>'; }
+  else if(!multi&&pSport(p)&&!pDivision(p)){ h+='<div class="valerr">Softball starts at 6U '+
+     '(Kindergarten). For questions, email <a href="mailto:'+CFG.registrarEmail+'">'+
+     CFG.registrarEmail+'</a>.</div>'; }
+  else if(es.length){ h+='<div class="feebox" id="pfee_'+i+'">'+playerFeeRows(p)+'</div>'; }
+  else if(multi){ h+='<div class="feebox" id="pfee_'+i+'"></div>'; }
+  return h+'</div>';
+}
+/* One child's fee box. Repainted in place when a program box is ticked -- render()
+   would destroy the checkbox the parent is standing on (CLAUDE.md traps). */
+function playerFeeRows(p){
+  var es=pEntries(p), h='';
+  for(var k=0;k<es.length;k++){
+    h+='<div class="frow"><span class="rl"><b>'+esc(divLabel(es[k].division))+'</b>'+
+      (CFG.schoolPrograms&&CFG.schoolPrograms[es[k].division]?'':' &middot; '+es[k].sport)+
+      (es[k].off?' <span class="chip">2nd program &minus;'+CFG.comboDiscountPercent+'%</span>':'')+
+      '</span><span class="fee">'+money(es[k].cents)+'</span></div>';
+  }
+  return es.length?h+tierNote():'<div class="help">Pick at least one program.</div>';
+}
+/* Tells a family WHY a PMS program is missing, instead of letting it silently not exist:
+   the grade and gender qualify, but the school picked is not the program's school. */
+function pmsHint(p){
+  if(!CFG||!CFG.schoolPrograms) return '';
+  var g=gradeKey(p.grade), out=[];
+  for(var name in CFG.schoolPrograms){ var r=CFG.schoolPrograms[name];
+    if(r.gender===p.gender&&g!==null&&(r.grades||[]).indexOf(g)>=0&&p.school!==r.school)
+      out.push(esc(divLabel(name))+' is for '+esc(r.school)+' students');
+  }
+  return out.length?'<div class="help">'+out.join('; ')+' &mdash; pick that school above '+
+    'to see it.</div>':'';
+}
+/* Ticking a program: update the model and repaint the numbers IN PLACE. */
+function wirePrograms(){
+  Array.prototype.forEach.call(document.querySelectorAll('input[data-prog]'),function(cb){
+    cb.onchange=function(){
+      var i=Number(cb.getAttribute('data-prog')), list=[];
+      /* One rec program per child: ticking a rec box clears the other rec box, in place. */
+      if(cb.checked&&cb.getAttribute('data-school')==='0')
+        Array.prototype.forEach.call(document.querySelectorAll('input[data-prog="'+i+'"][data-school="0"]'),
+          function(x){ if(x!==cb) x.checked=false; });
+      Array.prototype.forEach.call(document.querySelectorAll('input[data-prog="'+i+'"]'),
+        function(x){ if(x.checked) list.push(x.value); });
+      s.players[i].programs=list;
+      var box=document.getElementById('pfee_'+i);
+      if(box) box.innerHTML=playerFeeRows(s.players[i]);
+      paintStepTotal(); updateNext();
+    };
+  });
+}
+function stepTotalRow(){
+  var n=entryCount();
+  return '<div class="frow"><span class="rl">'+s.players.length+' player'+
+    (s.players.length>1?'s':'')+(n>s.players.length?' &middot; '+n+' programs':'')+
+    (procMandatory()?' &middot; incl. processing':'')+'</span><span class="fee">'+
+    money(subtotalCents()+procCents())+'</span></div>';
+}
+function paintStepTotal(){ var t=document.getElementById('steptotal'); if(t) t.innerHTML=stepTotalRow(); }
+
+function wirePlayerCards(){
+  bindInputs();
+  /* Tidy the birthdate to mm/dd/yyyy when the parent leaves the field, so "5 14 2016"
+     and "5-14-2016" both end up looking like the placeholder and nobody has to wonder
+     whether their separator was accepted.
+
+     onblur, NOT oninput -- reformatting mid-typing fights backspace and moves the caret.
+     And it sets .value only: this is emphatically NOT a re-render, which is forbidden on
+     blur here because it destroys the field being tabbed out of. The node survives, so
+     keyboard navigation is unaffected. */
+  Array.prototype.forEach.call(document.querySelectorAll('input[id$="_dob"]'),function(el){
+    var m=el.id.slice(2).match(/^p(\d+)_/);
+    var idx=m?+m[1]:null;
+    el.oninput=function(){
+      if(idx!==null&&s.players[idx]) s.players[idx].dob=el.value;
+      paintDob(idx); updateNext();
+    };
+    el.onblur=function(){
+      var tidy=dobDisplay(el.value);
+      if(tidy&&tidy!==el.value){
+        el.value=tidy;
+        if(idx!==null&&s.players[idx]) s.players[idx].dob=tidy;
+      }
+      paintDob(idx); updateNext();
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.opt[tabindex]'),function(o){
+    o.onkeydown=function(ev){
+      if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); o.click(); }
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-gender] .opt'),function(o){
+    o.onclick=function(){ var i=Number(o.parentNode.getAttribute('data-gender'));
+      s.players[i].gender=o.dataset.v;
+      applyAutoSport(s.players[i]);
+      render(); };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-sport] .opt'),function(o){
+    o.onclick=function(){ var i=Number(o.parentNode.getAttribute('data-sport'));
+      if(s.players[i].gender==='Male') return;
+      s.players[i].sport=o.dataset.v; s.players[i].sportAuto=false; render(); };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.rmbtn'),function(b){
+    b.onclick=function(){ removePlayer(Number(b.getAttribute('data-rm'))); };
+  });
+  wirePrograms();
+  var add=document.getElementById('addPlayer');
+  if(add) add.onclick=addPlayer;
+}
+
+/* Five entries, not one blanket checkbox -- see docs/adr/0011. The four risk and
+   consent documents stay separate because separateness is what makes each one
+   conspicuous; the four administrative acknowledgements merged into 'rules',
+   their texts concatenated verbatim. Three are load-bearing rather than
+   paperwork: the medical release authorises emergency treatment, the concussion
+   waiver exists because California AB 2007 requires youth sports organisations
+   to carry one, and the COVID waiver is a release. Text is transcribed verbatim
+   from test/fixtures/ and asserted by test/waivers.test.js -- never edit here. */
+/* Attribution, mirrored from waiverValueOk() in backend/Pricing.gs. Duplicated
+   deliberately: the client copy exists so a family sees the problem while they
+   are looking at the field, and the server copy is the one that decides. Keep
+   the two identical -- if they drift, the form accepts what the server rejects
+   and the family hits it only at submit, having filled in everything. */
+var NAME_SUFFIXES={jr:1,sr:1,ii:1,iii:1,iv:1,v:1,md:1,phd:1};
+function normName(v){
+  return String(v==null?'':v)
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase()
+    .replace(/[.,\-'\u2018\u2019]/g,' ').replace(/\s+/g,' ').trim();
+}
+function nameParts(n){
+  var s2=normName(n); if(!s2) return [];
+  var p=s2.split(' ');
+  if(p.length>1&&NAME_SUFFIXES[p[p.length-1]]) p=p.slice(0,-1);
+  return p;
+}
+function nameForms(n){
+  var p=nameParts(n); if(!p.length) return [];
+  var f=[p.join(' ')], full=normName(n);
+  if(f.indexOf(full)===-1) f.push(full);
+  if(p.length>2) f.push(p[0]+' '+p[p.length-1]);
+  return f;
+}
+function initialForms(n){
+  var p=nameParts(n); if(!p.length) return [];
+  var all='';
+  for(var i=0;i<p.length;i++) all+=p[i].charAt(0);
+  var f=[all];
+  if(p.length>1){ var fl=p[0].charAt(0)+p[p.length-1].charAt(0);
+    if(fl!==all) f.push(fl); }
+  return f;
+}
+function parentNames(){
+  var out=[];
+  if(normName(s.shared.p1name)) out.push(s.shared.p1name);
+  if(normName(s.shared.p2name)) out.push(s.shared.p2name);
+  return out;
+}
+/* A free-text box accepts "x" and records a consent identifying nobody. Matching
+   what was typed against the parents already entered is what makes the stored
+   value evidence rather than decoration. */
+function waiverValueOk(value,mode){
+  if(mode!=='signature'&&mode!=='initials') return false;   /* fail closed */
+  var v=normName(value); if(!v) return false;
+  var names=parentNames(); if(!names.length) return false;
+  var flat=v.replace(/ /g,'');
+  for(var i=0;i<names.length;i++){
+    /* A full name is more attribution than initials, so an initials field takes
+       one. The reverse is not true. */
+    var nf=nameForms(names[i]);
+    for(var j=0;j<nf.length;j++) if(nf[j]===v) return true;
+    if(mode==='initials'){
+      var ifs=initialForms(names[i]);
+      for(var k=0;k<ifs.length;k++) if(ifs[k]===flat) return true;
+    }
+  }
+  return false;
+}
+function waiverOk(w){
+  var rec=s.waivers[w.key], v=rec?String(rec.value||'').trim():'';
+  return v?waiverValueOk(v,w.mode):false;
+}
+/* Shown only once something has been typed: an empty field is already flagged
+   "required", and telling a family they got it wrong before they have started
+   is noise. */
+function waiverHint(w){
+  var rec=s.waivers[w.key], v=rec?String(rec.value||'').trim():'';
+  if(!v||waiverOk(w)) return '';
+  var names=parentNames();
+  if(!names.length) return 'Enter a parent or guardian name on the Family step first.';
+  return (w.mode==='signature')
+    ? 'Type the name exactly as entered on the Family step: '+names.join(' or ')
+    : 'Use the initials of '+names.join(' or ');
+}
+function waiversRemaining(){
+  var n=0; for(var i=0;i<WAIVERS.length;i++) if(!waiverOk(WAIVERS[i])) n++; return n;
+}
+function waiverCard(w){
+  var rec=s.waivers[w.key], val=rec?rec.value:'';
+  var done=waiverOk(w);
+  return '<div class="pcard"><div class="phead"><b>'+w.title+'</b>'+
+    (done?'<span class="chip calc" id="wc_'+w.key+'">signed</span>'
+          :'<span class="req" id="wc_'+w.key+'">required</span>')+'</div>'+
+    (w.link?'<p class="help"><a href="'+w.link+'" target="_blank" rel="noopener">Open the full document</a></p>':'')+
+    '<div class="wbody">'+esc(w.body).replace(/\n/g,'<br>')+'</div>'+
+    '<div class="q"><label class="qt">'+
+      (w.mode==='signature'
+        ? 'Type your full name to sign <span class="req" aria-hidden="true">*</span>'
+        : 'Enter your initials to agree <span class="req" aria-hidden="true">*</span>')+
+    '</label><input id="w_'+w.key+'" type="text" value="'+esc(val)+'"'+
+      ' aria-describedby="wh_'+w.key+'"'+
+      ' aria-invalid="'+((val&&!done)?'true':'false')+'"'+
+      ' placeholder="'+esc(waiverPlaceholder(w))+'">'+
+    '<div class="ferr whint" id="wh_'+w.key+'" aria-live="polite">'+
+      esc(waiverHint(w))+'</div>'+
+    '</div></div>';
+}
+/* Generic on purpose. An earlier version pre-filled the parent's own name, which
+   made the signature field a copy exercise -- you cannot argue that a typed name
+   evidences deliberateness while printing the string to copy above the cursor.
+   The hint reveals the expected spelling only after a mismatch, which keeps the
+   recovery path without pre-filling the act. */
+function waiverPlaceholder(w){
+  return w.mode==='signature' ? 'First and last name' : 'Your initials';
+}
+function wireWaivers(){
+  Array.prototype.forEach.call(document.querySelectorAll('input[id^="w_"]'),function(el){
+    var key=el.id.slice(2);
+    el.oninput=function(){
+      /* The client timestamp is the browser's clock and is both forgeable and often
+         simply wrong; the server records its own alongside it. Kept because it shows
+         the order the family signed in. */
+      s.waivers[key]={value:el.value, at:new Date().toISOString(), version:WAIVER_VERSION};
+      /* Update the chip in place. An earlier version re-rendered the step on blur,
+         which destroyed the DOM mid-tab and dropped focus -- that is precisely why
+         tabbing between waiver fields did not work. Never re-render on blur. */
+      var w=null;
+      for(var i=0;i<WAIVERS.length;i++) if(WAIVERS[i].key===key) w=WAIVERS[i];
+      var chip=document.getElementById('wc_'+key);
+      if(chip&&w){ var done=waiverOk(w);
+        chip.className=done?'chip calc':'req';
+        chip.textContent=done?'signed':'required'; }
+      /* Same in-place discipline as the chip: replacing the node would destroy
+         the field being typed into. */
+      var hint=document.getElementById('wh_'+key);
+      if(hint&&w) hint.textContent=waiverHint(w);
+      /* Announce the rejection to assistive tech too: without this the only
+         feedback is a chip and a colour, and Next simply stays disabled. */
+      if(w) el.setAttribute('aria-invalid',
+        (String(el.value||'').trim()&&!waiverOk(w))?'true':'false');
+      updateNext();
+    };
+  });
+}
+
+/* Cover page. Money figures come from CFG so they cannot drift from what the server
+   actually charges -- the one thing on this page that must never be a stale hardcode. */
+/* Deliberately permissive. The job is to catch a typo or a missing field, not to
+   police formats -- an over-strict rule rejects a real family and they simply leave. */
+function okEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v||'').trim()); }
+function okPhone(v){ var d=String(v||'').replace(/\D/g,'');
+  return d.length===10 || (d.length===11 && d.charAt(0)==='1'); }
+/* ZIP+4 is a real ZIP. A family who knows theirs types it, with or without the hyphen,
+   and the old exact-5-digit rule turned them away with a greyed-out Next (#41).
+   normZip returns the one stored shape, 94611 or 94611-1234, or null; the box keeps
+   what they typed and the payload carries the normal form, so the sheet gets one shape. */
+function normZip(v){ var m=String(v||'').trim().match(/^(\d{5})(?:[- ]?(\d{4}))?$/);
+  return m ? (m[2] ? m[1]+'-'+m[2] : m[1]) : null; }
+function okZip(v){ return normZip(v)!==null; }
+function withNormalZip(x){ var o={},k; for(k in x) o[k]=x[k];
+  if(normZip(x.zip)) o.zip=normZip(x.zip); return o; }
+/* Step 0's Next gate, named so the test suite can run it rather than grep for it. */
+function familyComplete(x){
+  return !!(x.addr&&x.city&&x.state&&okZip(x.zip)&&
+    x.p1name&&x.p1rel&&okEmail(x.p1email)&&okPhone(x.p1cell)&&
+    (!x.p2email||okEmail(x.p2email))&&(!x.p2cell||okPhone(x.p2cell))&&
+    x.ec_name&&okPhone(x.ec_phone)&&x.hospital&&x.physName&&okPhone(x.physPhone)&&
+    x.insCarrier&&x.policyHolder&&x.policyNumber); }
+/* "Did you mean…?" for typos of the big mail providers -- SUGGEST ONLY. A typo'd domain
+   (jane@gamil.com) is a valid address shape, so okEmail cannot catch it, and the family
+   then never gets a confirmation. We never block and never auto-change: an unusual
+   domain is often a real one, so the family can always keep what they typed.
+   Matching is edit distance (a swap counts as one edit) against this list, with a tighter
+   limit for short domains, plus real near-misses that must never be "corrected". */
+var EMAIL_PROVIDERS=['gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com','me.com',
+  'mac.com','aol.com','comcast.net','att.net','sbcglobal.net','sonic.net'];
+var EMAIL_REAL_LOOKALIKES=['mail.com','email.com','ymail.com','gmx.com','live.com','msn.com',
+  'aon.com','yahoo.ca','yahoo.co.uk','hotmail.ca','hotmail.co.uk','outlook.ca','att.com',
+  'comcast.com','mac.org','cloud.com','me.org'];
+function editDistance(a,b){
+  var d=[],i,j;
+  for(i=0;i<=a.length;i++){ d[i]=[i]; }
+  for(j=0;j<=b.length;j++){ d[0][j]=j; }
+  for(i=1;i<=a.length;i++) for(j=1;j<=b.length;j++){
+    var c=(a.charAt(i-1)===b.charAt(j-1))?0:1;
+    d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+c);
+    if(i>1&&j>1&&a.charAt(i-1)===b.charAt(j-2)&&a.charAt(i-2)===b.charAt(j-1))
+      d[i][j]=Math.min(d[i][j],d[i-2][j-2]+1);
+  }
+  return d[a.length][b.length];
+}
+/* The corrected address, or null when there is nothing to suggest. */
+function emailSuggestion(v){
+  var t=String(v==null?'':v).trim(), at=t.lastIndexOf('@');
+  if(at<1||at===t.length-1) return null;
+  var local=t.slice(0,at), dom=t.slice(at+1).toLowerCase();
+  if(/[\s@]/.test(local)) return null;            // not an address anyway; okEmail says so
+  if(EMAIL_PROVIDERS.indexOf(dom)>=0||EMAIL_REAL_LOOKALIKES.indexOf(dom)>=0) return null;
+  var dot=dom.lastIndexOf('.'), name=dot<0?dom:dom.slice(0,dot);
+  var best=null,bestD=99,i;
+  for(i=0;i<EMAIL_PROVIDERS.length;i++){
+    var p=EMAIL_PROVIDERS[i], pname=p.slice(0,p.lastIndexOf('.'));
+    if(dot<0&&(dom+'.com'===p||dom+'.net'===p)) return local+'@'+p;   // jane@gmail
+    if(name===pname) return local+'@'+p;                               // gmail.net, sbcglobal.com
+    /* Short provider names (me, mac, aol, att) sit one letter from real work domains --
+       ge.com, mmc.com, man.com -- so for those only a swapped pair counts (mca.com). */
+    if(pname.length<=3){
+      if(name.length===pname.length&&editDistance(name,pname)===1&&
+         name.split('').sort().join('')===pname.split('').sort().join(''))
+        return local+'@'+p;
+      continue;
+    }
+    var dd=editDistance(dom,p), max=(p.length<=7)?1:2;
+    if(dd<=max&&dd<bestD){ best=p; bestD=dd; }
+  }
+  return best?local+'@'+best:null;
+}
+/* One field's suggestion, painted in place under it. Dismissed per value, so "Keep mine"
+   sticks until the address is edited. */
+var _emailKept={};
+function paintEmailSuggestion(key){
+  var el=document.getElementById('f_'+key); if(!el) return;
+  var v=s.shared[key]||'', sug=emailSuggestion(v);
+  var old=document.getElementById('esugg_'+key);
+  /* Already showing for this value: leave it alone. Rebuilding on every blur swapped the
+     button out from under a mouse-down (field blurs first), so the first click on "Use"
+     was lost -- and a keyboard user tabbing to it landed on <body>. */
+  if(old&&old.getAttribute('data-for')===v&&sug&&_emailKept[key]!==v) return;
+  if(old) old.remove();
+  if(!sug||_emailKept[key]===v) return;
+  var d=document.createElement('div'); d.className='esugg'; d.id='esugg_'+key;
+  d.setAttribute('data-for',v);
+  d.setAttribute('role','status');
+  d.innerHTML='Did you mean <b>'+esc(sug)+'</b>?'+
+    '<button type="button" class="use">Use '+esc(sug.slice(sug.lastIndexOf('@')+1))+'</button>'+
+    '<button type="button" class="keep">Keep mine</button>';
+  d.querySelector('.use').onclick=function(){
+    el.value=sug; s.shared[key]=sug; d.remove(); paintErrors(); updateNext(); el.focus(); };
+  d.querySelector('.keep').onclick=function(){ _emailKept[key]=v; d.remove(); el.focus(); };
+  el.parentNode.appendChild(d);
+}
+/* Shown when the parent leaves the field (blur -- a paint, never a re-render), hidden
+   again as soon as they edit it. */
+function wireEmailSuggestions(){
+  ['p1email','p2email'].forEach(function(key){
+    var el=document.getElementById('f_'+key); if(!el) return;
+    el.addEventListener('blur',function(){ paintEmailSuggestion(key); });
+    el.addEventListener('input',function(){
+      var old=document.getElementById('esugg_'+key); if(old) old.remove(); });
+    if(s.shared[key]) paintEmailSuggestion(key);
+  });
+}
+function fieldErr(msg){ return '<div class="ferr">'+msg+'</div>'; }
+function liveErrors(){
+  /* Only complain about fields the family has actually filled in. Showing "invalid
+     email" on an empty box they have not reached yet is noise. */
+  var x=s.shared, e=[];
+  if(x.p1email && !okEmail(x.p1email)) e.push(['f_p1email','Enter a valid email address']);
+  if(x.p2email && !okEmail(x.p2email)) e.push(['f_p2email','Enter a valid email address']);
+  if(x.p1cell && !okPhone(x.p1cell))   e.push(['f_p1cell','Enter a 10-digit phone number']);
+  if(x.p2cell && !okPhone(x.p2cell))   e.push(['f_p2cell','Enter a 10-digit phone number']);
+  if(x.zip && !okZip(x.zip))           e.push(['f_zip','Enter a 5-digit ZIP (ZIP+4 is fine too)']);
+  if(x.ec_phone && !okPhone(x.ec_phone)) e.push(['f_ec_phone','Enter a 10-digit phone number']);
+  if(x.physPhone && !okPhone(x.physPhone)) e.push(['f_physPhone','Enter a 10-digit phone number']);
+  return e;
+}
+function paintErrors(){
+  /* :not(.whint) matters. The waiver hints are persistent nodes that borrow this
+     class for styling only; an unscoped sweep deletes all five permanently, and
+     since nothing re-renders that step they never come back -- silently. */
+  Array.prototype.forEach.call(document.querySelectorAll('.ferr:not(.whint)'),
+    function(n){n.remove();});
+  Array.prototype.forEach.call(document.querySelectorAll('.badfield'),function(n){
+    n.classList.remove('badfield');});
+  liveErrors().forEach(function(pair){
+    var el=document.getElementById(pair[0]); if(!el) return;
+    el.classList.add('badfield');
+    var d=document.createElement('div'); d.className='ferr'; d.textContent=pair[1];
+    el.parentNode.appendChild(d);
+  });
+}
+
+/* Both tier prices per division, derived from the server's own table. fees[] in
+   the config is the CURRENT tier only -- enough for a player card, not enough to
+   show a family what it costs before and after the deadline. No fee constant
+   lives here: if the backend predates standardFees/tiers this returns null and
+   the table renders without price columns rather than throwing, because a thrown
+   error inside render() is silence, not a message. */
+function tierAdjust(){
+  if(!CFG||!CFG.tiers) return null;
+  var adj={};
+  for(var i=0;i<CFG.tiers.length;i++) adj[CFG.tiers[i].name]=CFG.tiers[i].adjust;
+  return adj;
+}
+function tierPrices(){
+  if(!CFG||!CFG.standardFees||!CFG.tiers) return null;
+  var adj=tierAdjust();
+  if(!adj||adj.early==null||adj.standard==null) return null;
+  var out={};
+  for(var d in CFG.standardFees){
+    var row={};
+    for(var n in adj) row[n]=CFG.standardFees[d]+adj[n];
+    out[d]=row;
+  }
+  return out;
+}
+var TIER_LABELS={early:'Early bird',standard:'Standard',late:'Late'};
+var TIER_ORDER={early:0,standard:1,late:2};
+/* Which two columns to show. Always exactly one is in force: an earlier version
+   showed Early and Standard at every tier, so from September 5 the whole table
+   rendered struck through and the payable price appeared nowhere. */
+function coverCols(){
+  return (CFG&&CFG.tier==='late') ? ['standard','late'] : ['early','standard'];
+}
+function colClass(name){
+  var tier=CFG?CFG.tier:null;
+  if(name===tier) return ' now';
+  return (TIER_ORDER[name]<TIER_ORDER[tier]) ? ' past' : '';
+}
+function divTable(title,rows){
+  var P=tierPrices(), cols=coverCols();
+  var h='<div><p><b>'+title+'</b></p><table class="ptab"><thead><tr>'+
+    '<th scope="col">Division</th><th scope="col">Grades</th>';
+  if(P) for(var c=0;c<cols.length;c++)
+    h+='<th scope="col" class="p'+colClass(cols[c])+'">'+TIER_LABELS[cols[c]]+'</th>';
+  h+='</tr></thead><tbody>';
+  for(var i=0;i<rows.length;i++){
+    var d=rows[i][0];   // the price KEY; the cell shows the family-facing label
+    h+='<tr><td>'+divLabel(d)+'</td><td>'+rows[i][1]+'</td>';
+    if(P) for(var c2=0;c2<cols.length;c2++){
+      var p=(P[d]||{})[cols[c2]];
+      h+='<td class="p'+colClass(cols[c2])+'">'+(p!=null?'$'+p:'&mdash;')+'</td>';
+    }
+    h+='</tr>';
+  }
+  return h+'</tbody></table></div>';
+}
+/* Says something only when the table alone would mislead. Every figure and date
+   is derived: a PRICING_CONFIG edit that moves the September boundary or the late
+   adjustment must not leave this sentence confidently stating the old policy four
+   lines under the corrected table. */
+function tierFootnote(){
+  if(!tierPrices()||!CFG) return '';
+  var adj=tierAdjust()||{};
+  var lateFee=(adj.late!=null)?adj.late:null;
+  var stdEnds=CFG.standardEndsAtLabel;
+  if(CFG.tier==='standard')
+    return '<p class="tnote">Early bird pricing has ended.'+
+           (stdEnds?' Standard pricing applies through <b>'+esc(stdEnds)+'</b>.':'')+'</p>';
+  if(CFG.tier==='late')
+    return '<p class="tnote">Both deadlines have passed. Late registration'+
+           (lateFee!=null?' adds $'+lateFee+' per player and':'')+
+           ' is at the registrar&rsquo;s discretion.</p>';
+  return '<p class="tnote">Prices are per player. Early bird pricing is applied '+
+         'automatically until the deadline below.</p>';
+}
+function coverPage(){
+  /* The early-bird delta, not the CURRENT tier's adjustment. Math.abs(tierAdjust)
+     rendered "a $0 discount" from August 8 and "a $50 discount" -- the late fee --
+     from September 5, next to a table that said otherwise. */
+  var adj=tierAdjust()||{};
+  var disc=(adj.early!=null&&adj.standard!=null)?Math.abs(adj.standard-adj.early):25;
+  var lateFee=(adj.late!=null)?adj.late:50;
+  var stdEnds=(CFG&&CFG.standardEndsAtLabel)?CFG.standardEndsAtLabel:'Sunday, November 29';
+  var ends=(CFG&&CFG.tierEndsAtLabel)?CFG.tierEndsAtLabel:'Friday, October 30';
+  var reg=CFG?CFG.registrarEmail:'';
+  var pct=(CFG&&CFG.comboDiscountPercent)||0;
+  var proc=procMandatory()?(Math.round(CFG.processingFeeRate*1000)/10)+'% + '+
+    CFG.processingFeeFixedCents+'&cent;':'';
+  return '<div class="cover">'+
+  '<h2>Spring 2027 Registration</h2>'+
+  '<p>We are pleased to announce registration for our 2027 spring season. Both baseball '+
+  'and softball players can be registered with this same form, and you can register more '+
+  'than one child in a single registration and payment.</p>'+
+
+  /* Season dates are not settled yet (plan question G); evaluations are, and only for
+     cfg.evalDivisions (PBSF Registrar, 2026-10-27). */
+  '<p><b>Please read all of the instructions before registering.</b> Player evaluations '+
+  'for baseball <b>Pinto and up</b> and softball <b>8U and up</b> are on <b>Saturday, '+
+  'December 5</b> (rain date Saturday, December 12). We will email the details before '+
+  'then. Shetland and 6U players do not need to attend, and tryouts for the PMS teams '+
+  'are separate.</p>'+
+
+  '<p>Players are assigned divisions based on their grade level in California public schools '+
+  '(age cutoff September 1st), but may be adjusted later based on birthday to ensure '+
+  'eligibility.</p>'+
+
+  /* Grade labels are a THIRD copy of the division map (issue #3): keep them in step
+     with defaultConfig().divisions and docs/grade-division-map.md. */
+  '<div class="divs">'+
+    divTable('Baseball',[['Shetland','Pre-K &amp; K'],['Pinto','1st &amp; 2nd'],
+                         ['Mustang','3rd &amp; 4th'],['Bronco','5th &amp; 6th'],
+                         ['Pony','7th &amp; 8th'],['PMS Baseball','7th &amp; 8th, boys at PMS']])+
+    divTable('Softball (girls only)',[['6U','K &amp; 1st'],['8U','2nd &amp; 3rd'],
+                                      ['10U','4th &amp; 5th'],['12/14U','6th &ndash; 8th'],
+                                      ['PMS Softball','6th &ndash; 8th, girls at PMS']])+
+  '</div>'+
+  tierFootnote()+
+
+  /* PBSF Registrar's wording, verbatim (2026-10-20). Grades are a fourth copy of the PMS
+     rules -- keep them in step with schoolPrograms. The refund sentence states the combo
+     rule: a player cut from PMS loses the discount, so the refund is what they paid above
+     the full rec fee (comboDropRefund in Pricing.gs), not the whole PMS fee. */
+  '<p><b>Piedmont Middle School players:</b> We offer two programs: <b>Recreational</b> '+
+  '(Pony for baseball, 12/14U for softball) and <b>Competitive</b> (the PMS baseball team '+
+  'for grades 7&ndash;8, or the PMS softball team for grades 6&ndash;8). Players may '+
+  'register for one or both, as they don&rsquo;t conflict: Recreational plays on weekends '+
+  'and Competitive plays on weekdays. Competitive is tryout-based, and roster spots are '+
+  'not guaranteed.'+
+  (pct?' Players who register for both get '+pct+'% off the cheaper of the two '+
+  'registrations. If a player doesn&rsquo;t make the competitive team, we&rsquo;ll refund '+
+  'the difference, so they pay just the regular Recreational price.':' If a player '+
+  'doesn&rsquo;t make the competitive team, we&rsquo;ll refund their Competitive '+
+  'registration.')+'</p>'+
+
+  (proc?'<p>A <b>processing fee</b> is added to each order to cover what the card processor '+
+  'charges the league ('+proc+'). It is worked out on your order total, rounded up to the '+
+  'next dollar, and shown before you pay.</p>':'')+
+
+  '<p>Early Bird pricing, a <b>$'+disc+' discount</b>, ends <b>11:59pm '+ends+'</b>. '+
+  'The last day to register at standard pricing is <b>'+esc(stdEnds)+'</b>. '+
+  'Registrations after that may be accepted at the registrar\'s discretion, with a '+
+  '<b>$'+lateFee+' late fee</b>. Please also send an email to <a href="mailto:'+
+  reg+'">'+reg+'</a> if you are trying to register after registration is closed.</p>'+
+
+  '<p>Requests for division exceptions can be indicated in <b>Availability Notes</b> on the '+
+  'player\'s card. Please say why you are requesting an exception. Such requests will be '+
+  'considered, but are not guaranteed.</p>'+
+
+  '<div class="enf"><b>NOTE &mdash; Friend requests are only for softball and Shetland baseball.</b></div>'+
+  '<div class="nav"><button class="primary" id="begin" style="flex:1">Begin registration</button></div>'+
+  '</div>';
+}
+
+/* Back to the top whenever the SCREEN changes: cover to Family, step to step on Next or
+   Back, and the review to the saved screen. A family who presses Next at the bottom of
+   a long step then starts the next one at its heading, not halfway down it (PBSF
+   Registrar, 2026-10-27). Not on the many in-place re-renders WITHIN a step (picking a
+   gender, adding a player), which must leave the page where it is, and not on the first
+   paint. In the Wix embed the form scrolls inside its own short frame: scrollTo moves
+   the frame, and scrollIntoView on the header also scrolls the Wix page until the
+   frame's top meets the top of the window. Checked in headless Chrome on the live Wix
+   page with real clicks on Begin, Next and Back (2026-10-27). */
+var _screen=null;
+function screenKey(){ return s.intro?'intro':(s.saved?'saved':'step'+s.step); }
+function toTopOnNewScreen(){
+  var key=screenKey(), changed=(_screen!==null&&key!==_screen);
+  _screen=key;
+  if(!changed) return;
+  try{ window.scrollTo(0,0); }catch(e){}
+  var top=document.querySelector('header');
+  if(top&&top.scrollIntoView){ try{ top.scrollIntoView({block:'start'}); }catch(e){} }
+}
+
+function render(){
+  var st=document.getElementById('stage');
+  toTopOnNewScreen();
+  if(s.intro){
+    document.getElementById('steps').innerHTML='';
+    st.innerHTML=coverPage();
+    document.getElementById('begin').onclick=function(){ s.intro=false; render(); };
+    return;
+  }
+  renderSteps();
+
+  if(s.step===0){
+    st.innerHTML='<h2>Family &amp; Contact</h2><p class="sub">Who we contact about your '+
+      'child&rsquo;s team, and who we call in an emergency. You enter this once &mdash; it '+
+      'applies to every child you register.</p>'+reqLegend()+
+      '<h2 style="margin-top:4px">Parent / Guardian 1</h2>'+
+      '<div class="row"><div class="q"><label class="qt">Name <span class="req" aria-hidden="true">*</span></label>'+
+      '<input id="f_p1name" type="text" aria-required="true" value="'+esc(s.shared.p1name)+'"></div>'+
+      '<div class="q"><label class="qt">Relationship <span class="req" aria-hidden="true">*</span></label>'+
+      sel('f_p1rel',s.shared.p1rel,RELATIONS,true)+'</div></div>'+
+      '<div class="row">'+sfield('Email','p1email','email',true)+sfield('Cell phone','p1cell','tel',true)+'</div>'+
+      '<h2 style="margin-top:18px">Parent / Guardian 2 <span class="chip">optional</span></h2>'+
+      '<div class="row"><div class="q"><label class="qt">Name</label>'+
+      '<input id="f_p2name" type="text" value="'+esc(s.shared.p2name)+'"></div>'+
+      '<div class="q"><label class="qt">Relationship</label>'+
+      sel('f_p2rel',s.shared.p2rel,RELATIONS)+'</div></div>'+
+      '<div class="row">'+sfield('Email','p2email','email',false)+sfield('Cell phone','p2cell','tel',false)+'</div>'+
+      '<h2 style="margin-top:18px">Home Address</h2>'+
+      sfield('Street address','addr','text',true)+
+      '<div class="row">'+sfield('City','city','text',true)+sfield('State','state','text',true)+
+      /* No placeholder. A real parent read the greyed example as a pre-filled
+         value and left it, so the example cost more than it explained. */
+      sfield('ZIP','zip','text',true)+'</div>'+
+      '<h2 style="margin-top:18px">Emergency &amp; Medical</h2>'+
+      '<div class="row">'+sfield('Emergency contact','ec_name','text',true)+sfield('Emergency phone','ec_phone','tel',true)+'</div>'+
+      sfield('Preferred hospital','hospital','text',true)+
+      '<div class="row">'+sfield('Physician name','physName','text',true)+sfield('Physician phone','physPhone','tel',true)+'</div>'+
+      '<h2 style="margin-top:18px">Insurance</h2>'+
+      sfield('Insurance carrier','insCarrier','text',true)+
+      '<div class="row">'+sfield('Name of policy holder','policyHolder','text',true)+
+      sfield('Policy number','policyNumber','text',true)+'</div>'+
+      nav(false,'Next: Players');
+    bindInputs();
+    paintErrors();
+    wireEmailSuggestions();
+    wireNext(function(){ return familyComplete(s.shared); },
+      'Complete every required family field. ZIP must be 5 digits or ZIP+4; emails and phone numbers must be valid.');
+  }
+
+  else if(s.step===1){
+    var cards='';
+    for(var i=0;i<s.players.length;i++) cards+=playerCard(i);
+    st.innerHTML='<h2>Players</h2><p class="sub">Add each child you are registering &mdash; '+
+      'up to '+MAX_PLAYERS+' in one go. Division and fee are worked out from grade and '+
+      'sport, so each child is priced for their own division.</p>'+reqLegend()+cards+
+      (s.players.length<MAX_PLAYERS
+        ? '<button class="ghost" id="addPlayer" style="width:100%;margin-bottom:6px">+ Add another player</button>'
+        : '<div class="help">Maximum '+MAX_PLAYERS+' players per registration.</div>')+
+      '<div class="feebox" id="steptotal">'+stepTotalRow()+'</div>'+
+      nav(true,'Next: Review');
+    wirePlayerCards();
+    wireNext(function(){ return !firstPlayerProblem(); }, '');
+  }
+
+  else if(s.step===2){
+    var cards='';
+    for(var w=0;w<WAIVERS.length;w++) cards+=waiverCard(WAIVERS[w]);
+    /* Counted, not spelled. This said "All eight" above five cards for the whole
+       of the regroup, because no test asserts prose and a green suite says
+       nothing about a sentence. */
+    st.innerHTML='<h2>Waivers</h2><p class="sub">All '+WAIVERS.length+' are required, and cover every '+
+      'child on this registration. Open each one, read it, then sign it by typing your '+
+      'full name &mdash; exactly as you entered it on the Family step.</p>'+cards+
+      nav(true,'Next: Review');
+    wireWaivers();
+    wireNext(function(){ return waiversRemaining()===0; },'');
+  }
+
+  else if(s.step===3){
+    var lines=entryLines();
+    st.innerHTML='<h2>Review</h2><p class="sub">Check every child before paying. Use Back '+
+      'to change anything &mdash; nothing has been charged yet.</p>'+
+      '<div class="rev"><b>Family:</b> '+esc(s.shared.p1name)+'<br>'+
+      '<b>Address:</b> '+esc(s.shared.addr)+', '+esc(s.shared.city)+' '+esc(s.shared.zip)+'</div>'+
+      confirmationsLine()+
+      /* type=text, NOT type=number. The spinner arrows invite click-to-increment on a
+         field nobody nudges by one, and type=number silently discards what it cannot
+         parse -- so a typo becomes an empty box rather than a message. inputmode gets
+         the numeric keypad on a phone without any of that. */
+      '<section class="donbox" aria-labelledby="donHead">'+
+        '<div class="donhead" id="donHead">Support PBSF <span class="chip">Optional</span></div>'+
+        '<p class="dontext">PBSF is a non-profit run entirely by parent volunteers. If you would '+
+        'like to give a little extra, any amount helps &mdash; donations are tax-deductible. '+
+        'Tap an amount to add it, tap it again to remove it, or skip this entirely.</p>'+
+        donationPicks()+
+        /* Other reveals the free amount field; it stays in the DOM (hidden) so bindInputs
+           binds it once, and its handler repaints in place exactly as before. */
+        '<div id="donOther"'+(s.donChoice==='other'?'':' hidden')+'>'+
+        sfield('Donation amount ($)','donation','text',false,'0',
+               ' inputmode="decimal" autocomplete="off" aria-describedby="donErr"')+
+        '</div>'+
+        '<div id="donErr"></div>'+
+      '</section>'+
+      '<div class="feebox" id="feebox">'+feeboxRows(lines)+'</div>'+
+      nav(true,'Next: Payment');
+    bindInputs();
+    wireDonation();
+    wireConfirmationFixes();
+    paintDonation();
+    wireNext(function(){ return s.players.length>0 && !firstPlayerProblem()
+                                && !donationError(); },'');
+  }
+
+  else if(s.step===4){
+    if(s.saved){ st.innerHTML=savedNotPayableScreen(); return; }
+    st.innerHTML='<h2>Payment</h2><p class="sub">You will be taken to our payment page '+
+      'to finish. Your registration is saved first, so nothing is lost if the payment '+
+      'does not go through.</p>'+
+      supportBox()+
+      '<div class="amt">$'+totalWithSupport()+'</div>'+
+      '<button class="primary" id="payBtn" style="width:100%">Continue to payment</button>'+
+      '<div id="submitErr"></div>'+
+      '<div class="nav"><button class="ghost" id="back">Back</button></div>';
+    document.getElementById('back').onclick=function(){ s.step=3; render(); };
+    var sup=document.getElementById('f_support');
+    /* Update the total IN PLACE. render() rebuilds step 4 wholesale, which destroys the
+       checkbox the user just operated and drops focus to <body> -- a keyboard user tabs
+       here, presses Space, and loses their place in the document. Same failure the
+       "never re-render on blur" rule exists to prevent, different event. */
+    if(sup) sup.onchange=function(){
+      s.support=this.checked;
+      var amt=document.querySelector('.amt');
+      if(amt) amt.textContent='$'+totalWithSupport();
+    };
+    var pay=document.getElementById('payBtn');
+    pay.onclick=function(){ pay.disabled=true; pay.textContent='Submitting…';
+      submitToBackend().then(function(r){
+        if(r&&r.ok&&r.checkoutUrl){
+          pay.textContent='Taking you to payment…';
+          /* Painted BEFORE navigating, because a blocked navigation is silent -- see
+             goToCheckout. If the redirect works this page is gone and nobody reads it. */
+          document.getElementById('submitErr').innerHTML=
+            '<div class="enf" style="text-align:left"><b>Your registration is saved.</b> '+
+            'If you are not taken to the payment page automatically, '+
+            '<a href="'+esc(r.checkoutUrl)+'" target="_top" rel="noopener">open it '+
+            'here</a> to finish.</div>';
+          pay.disabled=false; pay.textContent='Continue to payment';
+          goToCheckout(r.checkoutUrl);   // leaves this page, if the browser allows it
+          return;
+        }
+        if(r&&r.ok){
+          /* ok WITHOUT a checkoutUrl means saved-but-not-payable: Stripe was
+             unreachable, or payment is not configured yet. The rows exist, so this is
+             not a failure and must not read like one -- note the lock-timeout message
+             says "nothing has been saved yet", which is true there and false here. */
+          s.saved=true; s.result=r; render(); return;
+        }
+        document.getElementById('submitErr').innerHTML=
+          '<div class="valerr">'+esc((r&&r.error)||'Submission failed.')+'</div>';
+        pay.disabled=false; pay.textContent='Submit registration';
+      }); };
+  }
+}
+
+/* Voluntary, unchecked by default, and the wording says "help cover" rather than
+   "cover". Both matter: the unchecked default and the "(optional)" are the only things
+   distinguishing this from a card surcharge, and California surcharging law is
+   unsettled enough to want to stay clearly on the other side of it. The figure is also
+   computed BEFORE any aid code is entered on Stripe's page, so an aid family
+   over-contributes -- "help cover" is honest about that where "cover" would not be. */
+function supportCents(){
+  if(!CFG||!CFG.processingFeeRate) return 0;
+  var base=Math.round((subtotalCents()+Math.round(donationNum()*100)));
+  if(base<=0) return 0;
+  var rate=CFG.processingFeeRate, fixed=CFG.processingFeeFixedCents;
+  var add=Math.floor((base+fixed)/(1-rate))-base-1;
+  if(add<0) add=0;
+  for(var i=0;i<8;i++){
+    var net=(base+add)-(Math.round((base+add)*rate)+fixed);
+    if(net>=base) return add;
+    add++;
+  }
+  return add;
+}
+function subtotalCents(){
+  // pFee is the form's existing per-player fee lookup -- reuse it rather than
+  // recomputing the division, or the two answers drift and the checkbox quotes a
+  // support figure against a subtotal the review step never showed.
+  return s.players.reduce(function(t,p){ return t+pFeeCents(p); },0);
+}
+function totalWithSupport(){
+  var c=procMandatory()?totalCents()
+    :subtotalCents()+Math.round(donationNum()*100)+(s.support?supportCents():0);
+  return (c/100).toFixed(2).replace(/\.00$/,'');
+}
+function supportBox(){
+  if(procMandatory()) return '';   // spring: a required fee, itemised on the review step
+  var c=supportCents();
+  // >0, not truthiness: if processingFeeFixedCents is ever absent from doGet, supportCents
+  // returns NaN and `!c` swallows it -- the checkbox silently never renders and there is
+  // no way to notice. This at least fails the same way as a zero rate.
+  if(!(c>0)) return '';
+  return '<label class="supportbox"><input type="checkbox" id="f_support"'+
+    (s.support?' checked':'')+'>'+
+    '<span class="sbtext">Add <b>'+money(c)+'</b> to help cover the card processing fee '+
+    '<i>(optional)</i><br><span class="sbnote">'+
+    'PBSF is a parent-volunteer run non-profit organization. Card processing costs '+
+    'the league about this much per registration.</span></span></label>';
+}
+
+/* Reached only when the server answered ok WITHOUT a checkoutUrl: the rows exist and
+   Stripe was unreachable or is not configured. NOT an error screen -- the registration
+   genuinely is saved -- and deliberately different from the lock-timeout message, which
+   says "nothing has been saved yet". */
+function savedNotPayableScreen(){
+  var to=esc(s.shared.p1email);
+  return '<div class="succ"><div class="big">✅</div><h2>Your registration is saved</h2>'+
+    '<p class="sub">We could not reach the payment system just now, so you have not '+
+    'been charged.</p>'+
+    '<div class="enf" style="text-align:left"><b>Nothing more to do right now.</b> '+
+    'We will email <b>'+to+'</b> a link to finish paying. Your place is not held until '+
+    'payment is received.</div>'+
+    '<p class="sub" style="font-size:12px">Reference: '+
+    esc((s.result&&s.result.groupId)||'')+'</p></div>';
+}
+
+function confirmScreen(){
+  var names=s.players.map(function(q){ return esc(q.first)+' '+esc(q.last); }).join(', ');
+  var to=esc(s.shared.p1email);
+  return '<div class="succ"><div class="big">🎉</div><h2>Registration received</h2>'+
+    '<div class="badge-paid">'+s.players.length+' player'+(s.players.length>1?'s':'')+' &middot; '+total()+'</div>'+
+    '<p class="sub">'+names+'</p>'+
+
+    '<div class="enf" style="text-align:left">'+
+    '<b>Check your email.</b> A confirmation is on its way to <b>'+to+'</b> with your '+
+    'players, divisions and fees. It usually arrives within a few minutes &mdash; if you '+
+    'do not see it, check your spam folder.'+
+    '</div>'+
+
+    /* Accurate for the pre-Stripe state. When payment lands this becomes the receipt
+       line; saying "you are registered" before money has moved is the version of this
+       screen that gets a child left off a roster. */
+    '<div class="valerr" style="text-align:left;margin-top:10px">'+
+    '<b>Payment is not complete yet.</b> Online payment is not switched on for this '+
+    'season yet, so your place is not held until we hear from you. We will follow up '+
+    'with payment instructions. Questions: <a href="mailto:'+esc(CFG.registrarEmail)+'">'+
+    esc(CFG.registrarEmail)+'</a>.'+
+    '</div>'+
+
+    '<div class="nav"><button class="primary" id="again">Register another family</button></div></div>';
+}
+
+function nav(showBack,label){ return '<div class="nav">'+
+  (showBack?'<button class="ghost" id="back">Back</button>':'')+
+  '<button class="primary" id="next" disabled>'+label+'</button></div>'; }
+
+var _valid=function(){return true;}, _msg='';
+function wireNext(fn,msg){ _valid=fn; _msg=msg||'';
+  var n=document.getElementById('next'), b=document.getElementById('back');
+  if(b) b.onclick=function(){ s.step--; render(); };
+  if(n){ n.onclick=function(){ if(_valid()){ s.step++; s.paid=false; render(); } }; }
+  updateNext(); }
+
+/* Extracted so the donation field can refresh the total WITHOUT render(). render()
+   rebuilds the step wholesale, which destroyed the input on every keystroke and dropped
+   focus to <body> -- verified: typing "250" produced three separate nodes, none focused.
+   The rule right above bindInputs' handler said text inputs must not re-render; the
+   donation field was exempted from it and should not have been. */
+function feeboxRows(lines){
+  return lines+
+    (donationNum()?'<div class="frow"><span class="rl">Donation</span><span>$'+
+      donationNum()+'</span></div>':'')+
+    '<div class="frow"><span class="rl"><b>Total due</b></span><span class="fee">'+
+      total()+'</span></div>';
+}
+
+/** Repaint one child's birthdate error in place. Never re-renders -- see paintDonation. */
+function paintDob(i){
+  if(i===null||i===undefined) return;
+  var box=document.getElementById('doberr_'+i);
+  if(!box) return;
+  var err=s.players[i]?dobError(s.players[i]):'';
+  box.innerHTML=err?'<div class="valerr">'+esc(err)+'</div>':'';
+  var el=document.getElementById('f_p'+i+'_dob');
+  if(el) el.setAttribute('aria-invalid',err?'true':'false');
+}
+
+/* Where the receipt goes -- the server mails Parent 1 and copies Parent 2. Bold, on the
+   last screen before money moves, because a typo here is a family who never hears back.
+   Repeats the "Did you mean" check as a last chance. */
+function confirmationsLine(){
+  var seen={}, to=[];
+  ['p1email','p2email'].forEach(function(k){ var x=String(s.shared[k]||'').trim();
+    if(x&&!seen[x.toLowerCase()]){ seen[x.toLowerCase()]=true; to.push([k,x]); } });
+  var h='<div class="revmail">Confirmations will go to '+to.map(function(e){
+    return '<b>'+esc(e[1])+'</b>'; }).join(' and ')+'.';
+  to.forEach(function(e){ var sg=emailSuggestion(e[1]);
+    // "Keep mine" on the family step is an answer; do not ask again here.
+    if(sg&&_emailKept[e[0]]!==s.shared[e[0]])
+      h+='<div class="esugg" style="margin-top:6px">'+esc(e[1])+' &mdash; did you mean <b>'+
+        esc(sg)+'</b>?<button type="button" class="use" data-fixkey="'+e[0]+'" data-fixv="'+
+        esc(sg)+'">Use '+esc(sg.slice(sg.lastIndexOf('@')+1))+'</button></div>'; });
+  return h+'</div>';
+}
+/* A click is the one moment a re-render is safe: the button is spent either way. */
+function wireConfirmationFixes(){
+  Array.prototype.forEach.call(document.querySelectorAll('.revmail button[data-fixkey]'),
+    function(b){ b.onclick=function(){
+      s.shared[b.getAttribute('data-fixkey')]=b.getAttribute('data-fixv'); render(); }; });
+}
+
+/* ---- Donation quick-picks. Nothing is preselected: a gift is opted into, never out of. */
+var DONATION_PICKS=['25','50','100'];
+/* Which pick an amount corresponds to -- for a family coming Back to this step. */
+function donationChoiceFor(amount){
+  var a=String(amount==null?'':amount).trim();
+  if(!a) return null;
+  return DONATION_PICKS.indexOf(a)>=0?a:'other';
+}
+/* Tapping a pick. The one already selected clears; Other starts empty for typing. */
+function donationTap(cur,tapped){
+  if(cur===tapped) return {choice:null,amount:''};
+  return {choice:tapped,amount:tapped==='other'?'':tapped};
+}
+function donationPicks(){
+  if(s.donChoice===undefined) s.donChoice=donationChoiceFor(s.shared.donation);
+  var opts=DONATION_PICKS.map(function(v){ return [v,'$'+v]; }).concat([['other','Other']]);
+  return '<div class="opts donpicks" role="radiogroup" aria-label="Donation amount" data-don>'+
+    opts.map(function(o){ var on=(s.donChoice===o[0]);
+      return '<div class="opt'+(on?' sel':'')+'" tabindex="0" role="radio" aria-checked="'+on+
+        '" data-v="'+o[0]+'">'+o[1]+'</div>'; }).join('')+'</div>';
+}
+/* In place, like every other control on this step: render() would destroy the button the
+   parent just tapped and drop focus to <body>. */
+function wireDonation(){
+  var f=document.getElementById('f_donation');
+  if(f&&s.donChoice!=='other') f.value='';
+  Array.prototype.forEach.call(document.querySelectorAll('[data-don] .opt'),function(o){
+    o.onclick=function(){
+      var t=donationTap(s.donChoice||null,o.getAttribute('data-v'));
+      s.donChoice=t.choice; s.shared.donation=t.amount;
+      Array.prototype.forEach.call(document.querySelectorAll('[data-don] .opt'),function(x){
+        var on=(x.getAttribute('data-v')===s.donChoice);
+        x.classList.toggle('sel',on); x.setAttribute('aria-checked',on?'true':'false'); });
+      var other=document.getElementById('donOther'), fld=document.getElementById('f_donation');
+      if(other) other.hidden=(t.choice!=='other');
+      if(fld){ fld.value=(t.choice==='other')?t.amount:''; if(t.choice==='other') fld.focus(); }
+      paintDonation();
+    };
+    o.onkeydown=function(ev){
+      if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); o.click(); } };
+  });
+}
+
+/** Repaint the donation error and the totals in place. Never re-renders. */
+function paintDonation(){
+  var err=donationError();
+  var box=document.getElementById('donErr');
+  if(box) box.innerHTML=err?'<div class="valerr">'+esc(err)+'</div>':'';
+  var el=document.getElementById('f_donation');
+  if(el) el.setAttribute('aria-invalid',err?'true':'false');
+  var fb=document.getElementById('feebox');
+  if(fb) fb.innerHTML=feeboxRows(entryLines());
+  updateNext();
+}
+
+function updateNext(){
+  var n=document.getElementById('next'); if(!n) return;
+  var problem=(s.step===1)?firstPlayerProblem():null;
+  if(s.step===2){ var r=waiversRemaining();
+    problem=r?(r+' waiver'+(r>1?'s':'')+' still to sign'):null; }
+  n.disabled=!_valid();
+  n.title=problem||_msg;
+  var hint=document.getElementById('navHint');
+  if(hint) hint.parentNode.removeChild(hint);
+  if(n.disabled&&problem){
+    var d=document.createElement('div'); d.id='navHint'; d.className='help';
+    d.style.textAlign='right'; d.textContent=problem;
+    n.parentNode.parentNode.insertBefore(d,n.parentNode);
+  }
+}
+
+document.addEventListener('click',function(e){ if(e.target&&e.target.id==='again'){ location.reload(); }});
+boot();
+</script>
+</body>
+</html>
