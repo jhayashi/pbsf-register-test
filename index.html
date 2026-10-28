@@ -92,7 +92,8 @@
   .amt{font-size:2rem;font-weight:800;margin:6px 0 12px}
   .stripe-pay{background:var(--stripe);color:#fff;width:100%} .stripe-pay:disabled{opacity:.6}
   .succ{text-align:center;padding:8px}
-  .succ .big{font-size:2.6rem} .badge-paid{display:inline-block;background:#e7f7ec;color:var(--ok);border:1px solid #b7e6c6;font-weight:800;padding:6px 14px;border-radius:20px;margin:8px 0}
+  .succ .big{font-size:2.6rem} .succ .done{font-size:.95rem;margin:4px 0 14px}
+  .badge-paid{display:inline-block;background:#e7f7ec;color:var(--ok);border:1px solid #b7e6c6;font-weight:800;padding:6px 14px;border-radius:20px;margin:8px 0}
   .cover{font-size:.9rem;line-height:1.65;color:#2c3542;max-width:82ch;margin:0 auto}
   .cover p{margin:0 0 11px} .cover ul{margin:0 0 11px 18px;padding:0}
   .divs{display:flex;gap:28px;flex-wrap:wrap}
@@ -257,9 +258,15 @@ function showReceipt(stage, data){
   var a=data.amounts||{};
   function row(label,cents){ return cents>0
     ? '<div class="rrow"><span>'+label+'</span><span>'+money(cents)+'</span></div>' : ''; }
+  /* "Payment received" alone left a family wondering whether anything was still to do
+     (Adam Schwartz, 2026-10-28), so the heading says what the payment achieved. Only this
+     screen may say it: the server answered ok, so the rows are PAID. The fallbacks in
+     handleReturn cannot establish that and must not borrow this wording. */
   stage.innerHTML='<div class="succ"><div class="big">🎉</div>'+
-    '<h2>Payment received</h2>'+
-    '<div class="badge-paid">'+money(a.total)+' paid</div>'+
+    '<h2>You&rsquo;re registered!</h2>'+
+    '<div class="badge-paid">Payment received &middot; '+money(a.total)+' paid</div>'+
+    '<p class="done"><b>Your registration is complete</b> and there&rsquo;s nothing more '+
+    'you need to do.</p>'+
     '<div class="enf" style="text-align:left">'+lines+
       row('Donation to PBSF',a.donation)+
       row(data.processingMandatory?'Processing fee':'Processing support',a.processingSupport)+
