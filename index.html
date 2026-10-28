@@ -264,9 +264,9 @@ function showReceipt(stage, data){
      handleReturn cannot establish that and must not borrow this wording. */
   stage.innerHTML='<div class="succ"><div class="big">🎉</div>'+
     '<h2>You&rsquo;re registered!</h2>'+
-    '<div class="badge-paid">Payment received &middot; '+money(a.total)+' paid</div>'+
-    '<p class="done"><b>Your registration is complete</b> and there&rsquo;s nothing more '+
-    'you need to do.</p>'+
+    '<div class="badge-paid">'+money(a.total)+' paid</div>'+
+    '<p class="done"><b>Payment received, and your registration is complete.</b> '+
+    'There&rsquo;s nothing more you need to do.</p>'+
     '<div class="enf" style="text-align:left">'+lines+
       row('Donation to PBSF',a.donation)+
       row(data.processingMandatory?'Processing fee':'Processing support',a.processingSupport)+
