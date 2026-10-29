@@ -408,6 +408,7 @@ function wireResume(groupId){
       .then(function(d){ settle(d,quoted); });
   }
   function settle(d,quoted){
+    if(d&&!d.ok&&(d.cancelled||d.released)){ resumeClosedScreen(d.error); return; }
     var need=ackList(d);
     if(need){
       /* A lapsed hold is re-placed when the family comes back (spec §4.4), so a division
@@ -435,6 +436,11 @@ function wireResume(groupId){
       };
       return;
     }
+    /* pay answers with the RECEIPT when Stripe says this registration was already paid
+       (they paid and closed the tab before the redirect): show it, never an error. */
+    if(d&&d.ok&&!d.checkoutUrl&&d.players&&d.amounts){
+      showReceipt(document.getElementById('stage'),d); return;
+    }
     if(d&&d.ok&&d.checkoutUrl){
       /* Same silent-refusal problem as submit, and worse here: this branch used
          to return unconditionally, leaving the button disabled on "One moment…"
@@ -460,11 +466,20 @@ function wireResume(groupId){
       {env:ENV,action:'quote',groupId:rp.groupId})})
       .then(function(r){return r.json();})
       .then(function(q){
+        if(q&&!q.ok&&(q.cancelled||q.released)){ resumeClosedScreen(q.error); return; }
         if(!q||!q.ok) throw new Error((q&&q.error)||'Could not load your registration.');
         return pay(q.quotedTotalCents);
       })
       .catch(fail);
   };
+}
+
+/* A registration that was cancelled, or replaced when the same child was registered again,
+   can't be paid: say so in place of the whole screen, so "nothing is lost" and a Continue
+   button are not left standing above the refusal (review finding). The server's message. */
+function resumeClosedScreen(msg){
+  document.getElementById('stage').innerHTML='<h2>This registration can no longer be paid</h2>'+
+    '<p class="sub">'+esc(msg||'')+'</p>';
 }
 
 /* The server's needsWaitlistAck list, or null. From submit and from pay alike: the group is
@@ -1966,16 +1981,33 @@ function submitResult(r,btn,errId,label){
    child on it), which is why it says so. */
 function filledUpScreen(){
   return filledUpHtml(s.ackNeeded.list)+
-    '<p class="sub">Cancel withdraws this registration for every child on it, and nothing '+
-    'is charged.</p>'+
-    '<div class="nav"><button class="ghost" id="ackCancel">Cancel</button>'+
+    '<p class="sub">Back takes you to the review step to change this registration (say, to '+
+    'register only the children who have a place). Cancel withdraws it for every child on '+
+    'it. Either way, nothing is charged.</p>'+
+    '<div class="nav"><button class="ghost" id="ackBack">Back</button>'+
+    '<button class="ghost" id="ackCancel">Cancel</button>'+
     '<button class="primary" id="ackContinue">Continue</button></div>'+
     '<div id="ackErr"></div>';
 }
 function wireFilledUp(){
-  var go=document.getElementById('ackContinue'), no=document.getElementById('ackCancel');
+  var go=document.getElementById('ackContinue'), no=document.getElementById('ackCancel'),
+      back=document.getElementById('ackBack');
+  /* Back: the saved attempt is withdrawn on the server (as Cancel does -- it holds a place
+     that must not linger), and the family is back on the review step with everything they
+     typed, under a NEW submissionId, so the edited registration is never replayed as the
+     old one. A review finding: without it the only ways out were Continue or losing the
+     whole form. */
+  back.onclick=function(){
+    go.disabled=true; no.disabled=true; back.disabled=true; back.textContent='One moment…';
+    cancelRegistration(s.ackNeeded.groupId,s.ackNeeded.submissionId).then(function(d){
+      if(d&&d.ok&&d.cancelled){ s.ackNeeded=null; resetSubmission(); s.step=3; render(); return; }
+      document.getElementById('ackErr').innerHTML='<div class="valerr">'+
+        esc((d&&d.error)||'We could not go back just now.')+' Nothing has been charged.</div>';
+      go.disabled=false; no.disabled=false; back.disabled=false; back.textContent='Back';
+    });
+  };
   go.onclick=function(){
-    go.disabled=true; no.disabled=true; go.textContent='One moment…';
+    go.disabled=true; no.disabled=true; back.disabled=true; go.textContent='One moment…';
     /* The SAME payload and the SAME submissionId, with the ack extended: the server
        replays the saved group and only now creates the Stripe session (spec §4.3). */
     var list=s.ackNeeded.list;
@@ -1984,19 +2016,20 @@ function wireFilledUp(){
     submitToBackend().then(function(r){
       submitResult(r,go,'ackErr','Continue');
       /* A session exists once a checkout link is painted, and the server refuses to
-         cancel a group with an open session -- so Cancel goes. */
-      if(r&&r.ok&&r.checkoutUrl) no.hidden=true; else no.disabled=false;
+         cancel a group with an open session -- so Cancel and Back go. */
+      if(r&&r.ok&&r.checkoutUrl){ no.hidden=true; back.hidden=true; }
+      else { no.disabled=false; back.disabled=false; }
     });
   };
   no.onclick=function(){
-    go.disabled=true; no.disabled=true; no.textContent='Cancelling…';
+    go.disabled=true; no.disabled=true; back.disabled=true; no.textContent='Cancelling…';
     cancelRegistration(s.ackNeeded.groupId,s.ackNeeded.submissionId).then(function(d){
       if(d&&d.ok&&d.cancelled){ s.ackNeeded=null; s.cancelled=true; render(); return; }
       /* No session was created, so nothing can have been charged whatever went wrong. */
       document.getElementById('ackErr').innerHTML='<div class="valerr">'+
         esc((d&&d.error)||'We could not cancel your registration.')+
         ' Nothing has been charged.</div>';
-      go.disabled=false; no.disabled=false; no.textContent='Cancel';
+      go.disabled=false; no.disabled=false; back.disabled=false; no.textContent='Cancel';
     });
   };
 }
