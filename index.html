@@ -119,6 +119,11 @@
   .enf{background:#eef8f0;border:1px solid #cfe9d6;border-radius:10px;padding:10px;font-size:.78rem;color:#12622f;margin-top:10px;text-align:left}
   .rrow{display:flex;justify-content:space-between;gap:12px;padding:3px 0}
   .rrow span:last-child{white-space:nowrap}
+  /* Division caps: a notice, not an error -- the family may well choose to go on. */
+  .fullmsg{font-size:.8rem;color:#6b5410;background:#fff8e6;border:1px solid #f0e2b8;
+    border-radius:8px;padding:7px 9px;margin:4px 0 8px;line-height:1.45;text-align:left}
+  .plines{text-align:left;font-size:.88rem;line-height:1.5;margin:0 0 12px}
+  .plines p{margin:0 0 7px}
 </style>
 </head>
 <body>
@@ -152,6 +157,15 @@ function submissionId(){
   if(!s._submissionId) s._submissionId=uuid4();
   return s._submissionId;
 }
+/* ...but one attempt per PAYLOAD. The server replays a known submissionId as the group it
+   first saved, so an id reused after an edit pays for the registration as it was, not as it
+   is on screen. Any Back, removing a child, and any player edit once the "has just filled
+   up" screen has been shown start a new attempt; the next submissionId() call mints it.
+   Continue on that screen must NOT come through here -- it is the same attempt, replayed
+   with the acknowledgement (spec §4.3). Acknowledgements from that screen belonged to the
+   old attempt's placement, so they go with it. */
+function resetSubmission(){ s._submissionId=null; s.ackExtra=[]; s._ackShown=false; }
+function playerEdited(){ if(s._ackShown) resetSubmission(); }
 function uuid4(){
   if(window.crypto&&crypto.randomUUID) return crypto.randomUUID();
   // randomUUID needs a secure context. https everywhere in practice, but a fallback
@@ -220,7 +234,11 @@ function submitToBackend(){
                considerCoaching:p.considerCoaching, friendRequest:p.friendRequest,
                notes:p.notes };
     }),
-    waivers:s.waivers
+    waivers:s.waivers,
+    /* The full divisions the family ticked through on the review step, plus any the
+       "has just filled up" screen added. The server sends no Stripe session while a
+       waitlisted division is missing from it (D3). */
+    waitlistAck:waitlistAck()
   };
   if(NOW_OVERRIDE) payload.now=NOW_OVERRIDE;
   return fetch(BACKEND_URL,{method:'POST',body:JSON.stringify(payload)})
@@ -250,10 +268,27 @@ function showReceipt(stage, data){
      redirect -- this is a fresh top-level page load, so s.players and total() are
      empty -- and building the receipt from them is the exact shape CLAUDE.md records
      from Task 5: a path nothing exercises, built from fields that are no longer there. */
-  var lines=(data.players||[]).map(function(p){
+  var ps=data.players||[];
+  /* Division caps (spec §5, v3.2): a waitlisted child has NO place, and this screen must
+     never say otherwise. Placement is the server's, read from the rows; it is never worked
+     out here. Only an explicit 'placed' counts as a place -- missing or unknown (an older
+     backend, a bug) reads as waitlisted, because a family wrongly told "registered" stops
+     looking for the email that says otherwise. */
+  function placed(p){ return !!p&&p.placement==='placed'; }
+  var allPlaced=ps.length>0&&ps.every(placed);
+  var lines=ps.map(function(p){
     return '<div class="rrow"><span>'+esc(p.name)+' &middot; '+esc(divLabel(p.division))+
-           (p.comboDiscount>0?' (2nd program)':'')+'</span>'+
+           (p.comboDiscount>0?' (2nd program)':'')+(placed(p)?'':' (waitlist)')+'</span>'+
            '<span>'+money(p.listFee)+'</span></div>';
+  }).join('');
+  /* One line per program. No position and no count, as in the email (D4). */
+  var until=data.backfillUntilLabel?' ('+esc(data.backfillUntilLabel)+')':'';
+  var where=ps.map(function(p){
+    var who='<b>'+esc(p.name)+' &mdash; '+esc(divLabel(p.division))+': ';
+    return placed(p)?'<p>'+who+'registered.</b></p>'
+      :'<p>'+who+'on the waitlist.</b> If a place opens we&rsquo;ll email you. If not, '+
+       'we&rsquo;ll refund what you paid for it after Opening Day'+until+', or sooner if '+
+       'you ask.</p>';
   }).join('');
   var a=data.amounts||{};
   function row(label,cents){ return cents>0
@@ -261,12 +296,21 @@ function showReceipt(stage, data){
   /* "Payment received" alone left a family wondering whether anything was still to do
      (Adam Schwartz, 2026-10-28), so the heading says what the payment achieved. Only this
      screen may say it: the server answered ok, so the rows are PAID. The fallbacks in
-     handleReturn cannot establish that and must not borrow this wording. */
-  stage.innerHTML='<div class="succ"><div class="big">🎉</div>'+
-    '<h2>You&rsquo;re registered!</h2>'+
-    '<div class="badge-paid">'+money(a.total)+' paid</div>'+
-    '<p class="done"><b>Payment received, and your registration is complete.</b> '+
-    'There&rsquo;s nothing more you need to do.</p>'+
+     handleReturn cannot establish that and must not borrow this wording.
+     And only when EVERY program has a place. With any program waitlisted the payment is
+     still complete -- that much is true and is what the family needs to hear -- but the
+     registration is not, so the heading says only what is known and the lines below say
+     who is where. No party popper for a child who has no place. */
+  stage.innerHTML='<div class="succ">'+(allPlaced
+    ? '<div class="big">🎉</div><h2>You&rsquo;re registered!</h2>'+
+      '<div class="badge-paid">'+money(a.total)+' paid</div>'+
+      '<p class="done"><b>Payment received, and your registration is complete.</b> '+
+      'There&rsquo;s nothing more you need to do.</p>'
+    : '<div class="big">✅</div><h2>Payment received</h2>'+
+      '<div class="badge-paid">'+money(a.total)+' paid</div>'+
+      '<p class="done"><b>Your payment is complete</b> and there&rsquo;s nothing more you '+
+      'need to do.</p>'+
+      '<div class="plines">'+where+'</div>')+
     '<div class="enf" style="text-align:left">'+lines+
       row('Donation to PBSF',a.donation)+
       row(data.processingMandatory?'Processing fee':'Processing support',a.processingSupport)+
@@ -348,47 +392,106 @@ function handleReturn(stage){
 }
 
 function wireResume(groupId){
-  var rp={groupId:groupId};
-  document.getElementById('resumeBtn').onclick=function(){
-      var b=this; b.disabled=true; b.textContent='One moment…';
-      /* quote first: it creates nothing and returns the amount, so a family whose
-         price moved sees the new figure BEFORE anything charges them. */
-      fetch(BACKEND_URL,{method:'POST',body:JSON.stringify(
-        {env:ENV,action:'quote',groupId:rp.groupId})})
-        .then(function(r){return r.json();})
-        .then(function(q){
-          if(!q||!q.ok) throw new Error((q&&q.error)||'Could not load your registration.');
-          return fetch(BACKEND_URL,{method:'POST',body:JSON.stringify(
-            {env:ENV,action:'pay',groupId:rp.groupId,
-             quotedTotalCents:q.quotedTotalCents,returnUrl:location.href})})
-            .then(function(r){return r.json();});
-        })
-        .then(function(d){
-          if(d&&d.ok&&d.checkoutUrl){
-            /* Same silent-refusal problem as submit, and worse here: this branch used
-               to return unconditionally, leaving the button disabled on "One moment…"
-               with no link and no error. Paint the escape hatch, then navigate. */
-            document.getElementById('resumeErr').innerHTML='<div class="enf" '+
-              'style="text-align:left">If you are not taken to the payment page '+
-              'automatically, <a href="'+esc(d.checkoutUrl)+'" target="_top" '+
-              'rel="noopener">open it here</a>.</div>';
-            b.disabled=false; b.textContent='Continue to payment';
-            goToCheckout(d.checkoutUrl); return;
-          }
-          if(d&&d.repriced){
-            document.getElementById('resumeErr').innerHTML='<div class="enf" '+
-              'style="text-align:left">'+esc(d.message)+' The amount is now <b>'+
-              money(d.quotedTotalCents)+'</b>. Press Continue again to pay it.</div>';
-            b.disabled=false; b.textContent='Continue to payment'; return;
-          }
-          throw new Error((d&&d.error)||'Could not start payment.');
-        })
-        .catch(function(e){
-          document.getElementById('resumeErr').innerHTML=
-            '<div class="valerr">'+esc(e.message)+'</div>';
-          b.disabled=false; b.textContent='Continue to payment';
-        });
-    };
+  /* acked: divisions the family has pressed Continue for on THIS screen, sent with every
+     later pay so a retry does not ask again. */
+  var rp={groupId:groupId}, acked=[];
+  var b=document.getElementById('resumeBtn');
+  function paint(h){ document.getElementById('resumeErr').innerHTML=h; }
+  function ready(){ b.hidden=false; b.disabled=false; b.textContent='Continue to payment'; }
+  function fail(e){ paint('<div class="valerr">'+esc(e.message)+'</div>'); ready(); }
+  function pay(quoted){
+    var body={env:ENV,action:'pay',groupId:rp.groupId,quotedTotalCents:quoted,
+              returnUrl:location.href};
+    if(acked.length) body.waitlistAck=acked.slice();
+    return fetch(BACKEND_URL,{method:'POST',body:JSON.stringify(body)})
+      .then(function(r){return r.json();})
+      .then(function(d){ settle(d,quoted); });
+  }
+  function settle(d,quoted){
+    var need=ackList(d);
+    if(need){
+      /* A lapsed hold is re-placed when the family comes back (spec §4.4), so a division
+         can fill while they were away. Ask before Stripe (D3). NOT NOW, not Cancel: this
+         link carries no submissionId, and cancel needs one -- the group is simply left
+         as it is, which needs nothing from the server. */
+      var again=(d.quotedTotalCents!=null)?d.quotedTotalCents:quoted;
+      b.hidden=true;
+      paint('<div class="pcard" style="margin-top:12px">'+filledUpHtml(need)+
+        '<p class="sub">Nothing has been charged yet.</p>'+
+        '<div class="nav"><button class="ghost" id="resumeNotNow">Not now</button>'+
+        '<button class="primary" id="resumeAckGo">Continue</button></div></div>');
+      var go=document.getElementById('resumeAckGo'), later=document.getElementById('resumeNotNow');
+      later.onclick=function(){
+        paint('<div class="enf" style="text-align:left"><b>Nothing has been charged.</b> '+
+          'Your registration is still saved, but no place is held until it is paid. You '+
+          'can come back and pay later with the link in your email.</div>');
+        ready();
+      };
+      go.onclick=function(){
+        go.disabled=true; later.disabled=true; go.textContent='One moment…';
+        for(var i=0;i<need.length;i++)
+          if(acked.indexOf(need[i].division)<0) acked.push(need[i].division);
+        pay(again).catch(fail);
+      };
+      return;
+    }
+    if(d&&d.ok&&d.checkoutUrl){
+      /* Same silent-refusal problem as submit, and worse here: this branch used
+         to return unconditionally, leaving the button disabled on "One moment…"
+         with no link and no error. Paint the escape hatch, then navigate. */
+      paint('<div class="enf" style="text-align:left">If you are not taken to the payment '+
+        'page automatically, <a href="'+esc(d.checkoutUrl)+'" target="_top" '+
+        'rel="noopener">open it here</a>.</div>');
+      ready();
+      goToCheckout(d.checkoutUrl); return;
+    }
+    if(d&&d.repriced){
+      paint('<div class="enf" style="text-align:left">'+esc(d.message)+' The amount is now <b>'+
+        money(d.quotedTotalCents)+'</b>. Press Continue again to pay it.</div>');
+      ready(); return;
+    }
+    throw new Error((d&&d.error)||'Could not start payment.');
+  }
+  b.onclick=function(){
+    b.disabled=true; b.textContent='One moment…';
+    /* quote first: it creates nothing and returns the amount, so a family whose
+       price moved sees the new figure BEFORE anything charges them. */
+    fetch(BACKEND_URL,{method:'POST',body:JSON.stringify(
+      {env:ENV,action:'quote',groupId:rp.groupId})})
+      .then(function(r){return r.json();})
+      .then(function(q){
+        if(!q||!q.ok) throw new Error((q&&q.error)||'Could not load your registration.');
+        return pay(q.quotedTotalCents);
+      })
+      .catch(fail);
+  };
+}
+
+/* The server's needsWaitlistAck list, or null. From submit and from pay alike: the group is
+   saved and placed, some program in it is waitlisted that the family has not acknowledged,
+   and NO Stripe session exists. Checked BEFORE checkoutUrl -- if both ever came back, paying
+   first would take money for a waitlist the family was never told about. */
+function ackList(r){
+  return (r&&r.ok&&Array.isArray(r.needsWaitlistAck)&&r.needsWaitlistAck.length)
+    ?r.needsWaitlistAck:null;
+}
+/* "<Division> has just filled up", one line per child. Names and divisions only: never a
+   count, a cap or a position (D4). Shared by the submit and the resume screens, which add
+   their own buttons. */
+function filledUpHtml(list){
+  var divs=[], lines='';
+  for(var i=0;i<list.length;i++){ var x=list[i]||{};
+    if(divs.indexOf(x.division)<0) divs.push(x.division);
+    lines+='<div>'+esc(x.first)+' will be on the waitlist for <b>'+
+      esc(divLabel(x.division))+'</b>.</div>';
+  }
+  var names=divs.map(function(d){ return esc(divLabel(d)); });
+  var head=names.length>1?names.slice(0,-1).join(', ')+' and '+names[names.length-1]+
+    ' have':names[0]+' has';
+  return '<h2>'+head+' just filled up</h2>'+
+    '<div class="fullmsg">'+lines+'</div>'+
+    '<p class="sub">If you continue, you pay in full now. If a place opens we&rsquo;ll '+
+    'email you, and if no place opens you&rsquo;ll be refunded.</p>';
 }
 
 function boot(){
@@ -496,7 +599,7 @@ function renderBanner(){
    so editing this file mints a new URL while the old one keeps serving old code
    forever -- this constant is what makes a stale copy refuse to run rather than
    quietly take a payment against outdated logic. Bump both together. */
-var FORM_VERSION='2027-spring-1';
+var FORM_VERSION='2027-spring-2';
 
 /* No fee table lives here any more. Prices come from the backend, which is the only
    thing that can be trusted with a clock-dependent price, and having one copy means
@@ -588,6 +691,8 @@ var s={ step:0,
            donation:'' },
   players:[ blankPlayer() ],
   waivers:{},
+  waitAck:{},      // review-step waitlist ticks, by ackKey()
+  ackExtra:[],     // divisions acknowledged on the "has just filled up" screen
   intro:true,
   paid:false };
 
@@ -761,6 +866,71 @@ function pEntries(p){
 }
 function pFeeCents(p){ return pEntries(p).reduce(function(t,e){ return t+e.cents; },0); }
 function entryCount(){ return s.players.reduce(function(t,p){ return t+pEntries(p).length; },0); }
+/* ---- Division caps (spec §5). The config GET says only full or not full, for capped
+   divisions only (D4): no cap, count or position ever reaches the page, and none is
+   printed. Absent -- an uncapped division, or an older backend with no capacity block --
+   means not full; the server decides at submit either way, and says so with
+   needsWaitlistAck if a division filled after this page loaded. ---- */
+function divFull(d){ return !!(CFG&&CFG.capacity&&CFG.capacity.full&&CFG.capacity.full[d]===true); }
+function fullNotice(p,d){
+  return '<div class="fullmsg">'+esc(divLabel(d))+' is full. If you continue, '+
+    (p.first?esc(p.first):'your child')+' will be on the waitlist.</div>';
+}
+/* What the review step asks the family to acknowledge: one entry per child per full
+   division. key ties a tick to the child and division it was given for, not to a list
+   position, so a tick survives Back and forth but not a change of child or division. */
+function ackKey(p,d){ return JSON.stringify([String(p.first||''),String(p.last||''),d]); }
+function waitlistedPrograms(){
+  var out=[];
+  for(var i=0;i<s.players.length;i++){ var p=s.players[i], pr=pPrograms(p);
+    for(var k=0;k<pr.length;k++) if(divFull(pr[k].division))
+      out.push({i:i,first:p.first,division:pr[k].division,key:ackKey(p,pr[k].division)});
+  }
+  return out;
+}
+function waitAcksMissing(){
+  var w=waitlistedPrograms(), n=0;
+  for(var k=0;k<w.length;k++) if(!(s.waitAck&&s.waitAck[w[k].key])) n++;
+  return n;
+}
+/* The payload's waitlistAck: each division whose every box is ticked, plus any division the
+   "has just filled up" screen added (s.ackExtra). Unique names -- the server's ack is per
+   division. */
+function waitlistAck(){
+  var out=[], w=waitlistedPrograms(), open={}, k;
+  for(k=0;k<w.length;k++) if(!(s.waitAck&&s.waitAck[w[k].key])) open[w[k].division]=true;
+  for(k=0;k<w.length;k++)
+    if(!open[w[k].division]&&out.indexOf(w[k].division)<0) out.push(w[k].division);
+  var x=s.ackExtra||[];
+  for(k=0;k<x.length;k++) if(out.indexOf(x[k])<0) out.push(x[k]);
+  return out;
+}
+/* The review step's required boxes, in the waiver cards' style. */
+function waitAckBoxes(){
+  var w=waitlistedPrograms();
+  if(!w.length) return '';
+  var h='<div class="pcard" id="waitacks" style="margin-top:14px"><div class="phead">'+
+    '<b>Waitlist</b><span class="req">required</span></div>';
+  for(var k=0;k<w.length;k++){
+    h+='<label class="supportbox"><input type="checkbox" data-wack="'+w[k].i+'" value="'+
+      esc(w[k].division)+'"'+reqAttr(true)+(s.waitAck&&s.waitAck[w[k].key]?' checked':'')+'>'+
+      '<span class="sbtext">I understand <b>'+esc(w[k].first)+'</b> is on the waitlist for <b>'+
+      esc(divLabel(w[k].division))+'</b>. I&rsquo;m paying in full now and will be refunded '+
+      'if no place opens.</span></label>';
+  }
+  return h+'</div>';
+}
+/* In place, never render(): the family is standing on the box (CLAUDE.md traps). */
+function wireWaitAcks(){
+  Array.prototype.forEach.call(document.querySelectorAll('input[data-wack]'),function(cb){
+    cb.onchange=function(){
+      var p=s.players[Number(cb.getAttribute('data-wack'))];
+      if(!s.waitAck) s.waitAck={};
+      if(p) s.waitAck[ackKey(p,cb.value)]=!!cb.checked;
+      updateNext();
+    };
+  });
+}
 /* Spring's required processing fee: Stripe's exact cost on the whole order, rounded up to
    the dollar -- the server's own functions, above. When it is on, fall's voluntary
    support box is gone. It moves with the donation, so it is recomputed on every paint. */
@@ -862,7 +1032,7 @@ function bindInputs(){
   function(el){
     var id=el.id.slice(2), m=id.match(/^p(\d+)_(.+)$/);
     var h=function(){
-      if(m){ var i=Number(m[1]); if(s.players[i]) s.players[i][m[2]]=el.value; }
+      if(m){ var i=Number(m[1]); if(s.players[i]) s.players[i][m[2]]=el.value; playerEdited(); }
       else { s.shared[id]=el.value; }
       /* Grade selects the division and therefore the price, so the card has to be
          redrawn -- updateNext() alone would leave the fee box stale or absent.
@@ -875,7 +1045,11 @@ function bindInputs(){
       // Donation used to render() here, destroying the field mid-word. It repaints the
       // error and the totals in place instead.
       else if(id==='donation') paintDonation();
-      else { updateNext(); if(s.step===0) paintErrors(); }
+      else {
+        /* The full notice names the child, so a first name typed after the grade repaints
+           the fee box -- in place, not the field being typed into. */
+        if(m&&m[2]==='first') paintPlayerFee(Number(m[1]));
+        updateNext(); if(s.step===0) paintErrors(); }
     };
     el.oninput=h; el.onchange=h;
   });
@@ -954,8 +1128,9 @@ function firstPlayerProblem(){
   return null;
 }
 
-function addPlayer(){ if(s.players.length<MAX_PLAYERS){ s.players.push(blankPlayer()); render(); } }
-function removePlayer(i){ if(s.players.length>1){ s.players.splice(i,1); render(); } }
+function addPlayer(){ if(s.players.length<MAX_PLAYERS){ s.players.push(blankPlayer()); playerEdited(); render(); } }
+/* A different set of children is a different registration: never replay the old one. */
+function removePlayer(i){ if(s.players.length>1){ s.players.splice(i,1); resetSubmission(); render(); } }
 
 function playerCard(i){
   var p=s.players[i], multi=pMulti(p), es=pEntries(p);
@@ -1050,8 +1225,15 @@ function playerFeeRows(p){
       (CFG.schoolPrograms&&CFG.schoolPrograms[es[k].division]?'':' &middot; '+es[k].sport)+
       (es[k].off?' <span class="chip">2nd program &minus;'+CFG.comboDiscountPercent+'%</span>':'')+
       '</span><span class="fee">'+money(es[k].cents)+'</span></div>';
+    /* Under the row it is about, so a child with a rec program and PMS sees which one.
+       Lives in the fee box because that is what wirePrograms repaints in place. */
+    if(divFull(es[k].division)) h+=fullNotice(p,es[k].division);
   }
   return es.length?h+tierNote():'<div class="help">Pick at least one program.</div>';
+}
+function paintPlayerFee(i){
+  var box=document.getElementById('pfee_'+i);
+  if(box&&s.players[i]) box.innerHTML=playerFeeRows(s.players[i]);
 }
 /* Tells a family WHY a PMS program is missing, instead of letting it silently not exist:
    the grade and gender qualify, but the school picked is not the program's school. */
@@ -1077,8 +1259,8 @@ function wirePrograms(){
       Array.prototype.forEach.call(document.querySelectorAll('input[data-prog="'+i+'"]'),
         function(x){ if(x.checked) list.push(x.value); });
       s.players[i].programs=list;
-      var box=document.getElementById('pfee_'+i);
-      if(box) box.innerHTML=playerFeeRows(s.players[i]);
+      playerEdited();
+      paintPlayerFee(i);
       paintStepTotal(); updateNext();
     };
   });
@@ -1107,7 +1289,7 @@ function wirePlayerCards(){
     var idx=m?+m[1]:null;
     el.oninput=function(){
       if(idx!==null&&s.players[idx]) s.players[idx].dob=el.value;
-      paintDob(idx); updateNext();
+      playerEdited(); paintDob(idx); updateNext();
     };
     el.onblur=function(){
       var tidy=dobDisplay(el.value);
@@ -1127,12 +1309,12 @@ function wirePlayerCards(){
     o.onclick=function(){ var i=Number(o.parentNode.getAttribute('data-gender'));
       s.players[i].gender=o.dataset.v;
       applyAutoSport(s.players[i]);
-      render(); };
+      playerEdited(); render(); };
   });
   Array.prototype.forEach.call(document.querySelectorAll('[data-sport] .opt'),function(o){
     o.onclick=function(){ var i=Number(o.parentNode.getAttribute('data-sport'));
       if(s.players[i].gender==='Male') return;
-      s.players[i].sport=o.dataset.v; s.players[i].sportAuto=false; render(); };
+      s.players[i].sport=o.dataset.v; s.players[i].sportAuto=false; playerEdited(); render(); };
   });
   Array.prototype.forEach.call(document.querySelectorAll('.rmbtn'),function(b){
     b.onclick=function(){ removePlayer(Number(b.getAttribute('data-rm'))); };
@@ -1587,7 +1769,8 @@ function coverPage(){
    frame's top meets the top of the window. Checked in headless Chrome on the live Wix
    page with real clicks on Begin, Next and Back (2026-10-27). */
 var _screen=null;
-function screenKey(){ return s.intro?'intro':(s.saved?'saved':'step'+s.step); }
+function screenKey(){ return s.intro?'intro':(s.saved?'saved':(s.cancelled?'cancelled':
+  (s.ackNeeded?'ack':'step'+s.step))); }
 function toTopOnNewScreen(){
   var key=screenKey(), changed=(_screen!==null&&key!==_screen);
   _screen=key;
@@ -1701,17 +1884,23 @@ function render(){
         '<div id="donErr"></div>'+
       '</section>'+
       '<div class="feebox" id="feebox">'+feeboxRows(lines)+'</div>'+
+      /* Last thing before Next, so the disabled button sits right under the box it waits
+         for (D3: told before paying). */
+      waitAckBoxes()+
       nav(true,'Next: Payment');
     bindInputs();
     wireDonation();
     wireConfirmationFixes();
+    wireWaitAcks();
     paintDonation();
     wireNext(function(){ return s.players.length>0 && !firstPlayerProblem()
-                                && !donationError(); },'');
+                                && !donationError() && !waitAcksMissing(); },'');
   }
 
   else if(s.step===4){
     if(s.saved){ st.innerHTML=savedNotPayableScreen(); return; }
+    if(s.cancelled){ st.innerHTML=cancelledScreen(); return; }
+    if(s.ackNeeded){ st.innerHTML=filledUpScreen(); wireFilledUp(); return; }
     st.innerHTML='<h2>Payment</h2><p class="sub">You will be taken to our payment page '+
       'to finish. Your registration is saved first, so nothing is lost if the payment '+
       'does not go through.</p>'+
@@ -1720,7 +1909,7 @@ function render(){
       '<button class="primary" id="payBtn" style="width:100%">Continue to payment</button>'+
       '<div id="submitErr"></div>'+
       '<div class="nav"><button class="ghost" id="back">Back</button></div>';
-    document.getElementById('back').onclick=function(){ s.step=3; render(); };
+    document.getElementById('back').onclick=goBack;
     var sup=document.getElementById('f_support');
     /* Update the total IN PLACE. render() rebuilds step 4 wholesale, which destroys the
        checkbox the user just operated and drops focus to <body> -- a keyboard user tabs
@@ -1734,31 +1923,97 @@ function render(){
     var pay=document.getElementById('payBtn');
     pay.onclick=function(){ pay.disabled=true; pay.textContent='Submitting…';
       submitToBackend().then(function(r){
-        if(r&&r.ok&&r.checkoutUrl){
-          pay.textContent='Taking you to payment…';
-          /* Painted BEFORE navigating, because a blocked navigation is silent -- see
-             goToCheckout. If the redirect works this page is gone and nobody reads it. */
-          document.getElementById('submitErr').innerHTML=
-            '<div class="enf" style="text-align:left"><b>Your registration is saved.</b> '+
-            'If you are not taken to the payment page automatically, '+
-            '<a href="'+esc(r.checkoutUrl)+'" target="_top" rel="noopener">open it '+
-            'here</a> to finish.</div>';
-          pay.disabled=false; pay.textContent='Continue to payment';
-          goToCheckout(r.checkoutUrl);   // leaves this page, if the browser allows it
-          return;
-        }
-        if(r&&r.ok){
-          /* ok WITHOUT a checkoutUrl means saved-but-not-payable: Stripe was
-             unreachable, or payment is not configured yet. The rows exist, so this is
-             not a failure and must not read like one -- note the lock-timeout message
-             says "nothing has been saved yet", which is true there and false here. */
-          s.saved=true; s.result=r; render(); return;
-        }
-        document.getElementById('submitErr').innerHTML=
-          '<div class="valerr">'+esc((r&&r.error)||'Submission failed.')+'</div>';
-        pay.disabled=false; pay.textContent='Submit registration';
-      }); };
+        submitResult(r,pay,'submitErr','Continue to payment'); }); };
   }
+}
+
+/* One submit response, from Pay or from Continue on the "has just filled up" screen. */
+function submitResult(r,btn,errId,label){
+  var need=ackList(r);
+  if(need){
+    /* Saved and placed, with no Stripe session: a division filled after this page loaded,
+       or twins met the last place. Ask (D3). The id is remembered for Cancel, and Continue
+       replays this same attempt -- see resetSubmission. */
+    s.ackNeeded={groupId:r.groupId,submissionId:s._submissionId,list:need};
+    s._ackShown=true; render(); return;
+  }
+  if(r&&r.ok&&r.checkoutUrl){
+    btn.textContent='Taking you to payment…';
+    /* Painted BEFORE navigating, because a blocked navigation is silent -- see
+       goToCheckout. If the redirect works this page is gone and nobody reads it. */
+    document.getElementById(errId).innerHTML=
+      '<div class="enf" style="text-align:left"><b>Your registration is saved.</b> '+
+      'If you are not taken to the payment page automatically, '+
+      '<a href="'+esc(r.checkoutUrl)+'" target="_top" rel="noopener">open it '+
+      'here</a> to finish.</div>';
+    btn.disabled=false; btn.textContent=label;
+    goToCheckout(r.checkoutUrl);   // leaves this page, if the browser allows it
+    return;
+  }
+  if(r&&r.ok){
+    /* ok WITHOUT a checkoutUrl means saved-but-not-payable: Stripe was
+       unreachable, or payment is not configured yet. The rows exist, so this is
+       not a failure and must not read like one -- note the lock-timeout message
+       says "nothing has been saved yet", which is true there and false here. */
+    s.ackNeeded=null; s.saved=true; s.result=r; render(); return;
+  }
+  document.getElementById(errId).innerHTML=
+    '<div class="valerr">'+esc((r&&r.error)||'Submission failed.')+'</div>';
+  btn.disabled=false; btn.textContent=label;
+}
+
+/* The submit path's "has just filled up" screen. Cancel withdraws the whole group (every
+   child on it), which is why it says so. */
+function filledUpScreen(){
+  return filledUpHtml(s.ackNeeded.list)+
+    '<p class="sub">Cancel withdraws this registration for every child on it, and nothing '+
+    'is charged.</p>'+
+    '<div class="nav"><button class="ghost" id="ackCancel">Cancel</button>'+
+    '<button class="primary" id="ackContinue">Continue</button></div>'+
+    '<div id="ackErr"></div>';
+}
+function wireFilledUp(){
+  var go=document.getElementById('ackContinue'), no=document.getElementById('ackCancel');
+  go.onclick=function(){
+    go.disabled=true; no.disabled=true; go.textContent='One moment…';
+    /* The SAME payload and the SAME submissionId, with the ack extended: the server
+       replays the saved group and only now creates the Stripe session (spec §4.3). */
+    var list=s.ackNeeded.list;
+    for(var i=0;i<list.length;i++)
+      if(s.ackExtra.indexOf(list[i].division)<0) s.ackExtra.push(list[i].division);
+    submitToBackend().then(function(r){
+      submitResult(r,go,'ackErr','Continue');
+      /* A session exists once a checkout link is painted, and the server refuses to
+         cancel a group with an open session -- so Cancel goes. */
+      if(r&&r.ok&&r.checkoutUrl) no.hidden=true; else no.disabled=false;
+    });
+  };
+  no.onclick=function(){
+    go.disabled=true; no.disabled=true; no.textContent='Cancelling…';
+    cancelRegistration(s.ackNeeded.groupId,s.ackNeeded.submissionId).then(function(d){
+      if(d&&d.ok&&d.cancelled){ s.ackNeeded=null; s.cancelled=true; render(); return; }
+      /* No session was created, so nothing can have been charged whatever went wrong. */
+      document.getElementById('ackErr').innerHTML='<div class="valerr">'+
+        esc((d&&d.error)||'We could not cancel your registration.')+
+        ' Nothing has been charged.</div>';
+      go.disabled=false; no.disabled=false; no.textContent='Cancel';
+    });
+  };
+}
+/* Needs the submissionId as well as the groupId: the groupId is printed on receipts, so it
+   alone must not be enough to withdraw someone's registration (spec §4.4). */
+function cancelRegistration(groupId,sid){
+  return fetch(BACKEND_URL,{method:'POST',body:JSON.stringify(
+    {env:ENV,action:'cancel',groupId:groupId,submissionId:sid})})
+    .then(function(r){ return r.json(); })
+    .catch(function(){ return {ok:false,error:'Could not reach the registration server.'}; });
+}
+/* Start over is a reload (the "again" handler at the bottom): fresh state, a new
+   submissionId, and -- the part an in-memory reset would miss -- fresh full flags. */
+function cancelledScreen(){
+  return '<h2>Cancelled &mdash; nothing was charged</h2>'+
+    '<p class="sub">Your registration has been withdrawn, and you have not been charged.</p>'+
+    '<div class="nav"><button class="primary" id="again">Start over</button></div>';
 }
 
 /* Voluntary, unchecked by default, and the wording says "help cover" rather than
@@ -1854,9 +2109,12 @@ function nav(showBack,label){ return '<div class="nav">'+
   '<button class="primary" id="next" disabled>'+label+'</button></div>'; }
 
 var _valid=function(){return true;}, _msg='';
+/* Every Back starts a new submission attempt: what is on screen may change from here, and
+   a reused id would replay the registration as first sent (resetSubmission). */
+function goBack(){ resetSubmission(); s.step--; render(); }
 function wireNext(fn,msg){ _valid=fn; _msg=msg||'';
   var n=document.getElementById('next'), b=document.getElementById('back');
-  if(b) b.onclick=function(){ s.step--; render(); };
+  if(b) b.onclick=goBack;
   if(n){ n.onclick=function(){ if(_valid()){ s.step++; s.paid=false; render(); } }; }
   updateNext(); }
 
@@ -1968,6 +2226,9 @@ function updateNext(){
   var problem=(s.step===1)?firstPlayerProblem():null;
   if(s.step===2){ var r=waiversRemaining();
     problem=r?(r+' waiver'+(r>1?'s':'')+' still to sign'):null; }
+  if(s.step===3&&waitAcksMissing())
+    problem='Tick the waitlist '+(waitlistedPrograms().length>1?'boxes':'box')+
+      ' above to continue';
   n.disabled=!_valid();
   n.title=problem||_msg;
   var hint=document.getElementById('navHint');
